@@ -16,7 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static java.security.AccessController.getContext;
-
 public class MainActivity extends AppCompatActivity {
     //view Objects
     private Button buttonScan;
@@ -32,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
         //View Objects
         buttonScan = (Button) findViewById(R.id.buttonScan);
+        textViewName = (TextView) findViewById(R.id.textViewName);
+        textViewAddress = (TextView) findViewById(R.id.textViewAddress);
+        textViewResult = (TextView)  findViewById(R.id.textViewResult);
 
         //intializing scan object
         qrScan = new IntentIntegrator(this);
@@ -41,15 +43,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //scan option
                 qrScan.setPrompt("Scanning...");
-                //qrScan.setOrientationLocked(false);
+                qrScan.setOrientationLocked(false);
                 qrScan.initiateScan();
             }
         });
     }
 
-    /*
     //Getting the scan results
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                     JSONObject obj = new JSONObject(result.getContents());
                     textViewName.setText(obj.getString("name"));
                     textViewAddress.setText(obj.getString("address"));
+                    String address = obj.getString("address");// 주소 받아오기
                 } catch (JSONException e) {
                     e.printStackTrace();
                     //Toast.makeText(MainActivity.this, result.getContents(), Toast.LENGTH_LONG).show();
@@ -76,6 +77,4 @@ public class MainActivity extends AppCompatActivity {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
-
-     */
 }
