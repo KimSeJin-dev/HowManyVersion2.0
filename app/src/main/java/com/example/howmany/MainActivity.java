@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -21,16 +22,20 @@ import com.google.zxing.integration.android.IntentResult;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import im.dacer.androidcharts.LineView;
+import im.dacer.androidcharts.BarView;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MyTag";
 
-   // private DatabaseReference mDatabase;// 파이어베이스 연결
+  //  private FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
+   // private DatabaseReference mDatabaseReference = mFirebaseDatabase.getReference().child("information");
 
 
 
-
-    private static final String TAG = "MyTAG";
+    private LineView lineView;
     //view Objects
     private Button buttonScan;
     private TextView textViewName, textViewAddress, textViewResult;
@@ -43,7 +48,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //mDatabase = FirebaseDatabase.getInstance().getReference(); //파이어베이스 연결
+
+
+
+
+
+
+
+
+
 
 
         // 리사이클러뷰에 표시할 데이터 리스트 생성.
@@ -88,7 +101,56 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
+        /*
+        lineView = (LineView) findViewById(R.id.line_view);
+
+        //list data
+        List<AirQualityData> data = db.todayAirQualityData();
+
+        //lable
+        ArrayList<String> hour = new ArrayList<String>();
+        //3 data sets
+
+        ArrayList<Integer> dataList_10 = new ArrayList<>();
+        ArrayList<Integer> dataList_2_5 = new ArrayList<>();
+        ArrayList<Integer> dataList_1_0 = new ArrayList<>();
+
+        //put db data into arrays
+        for(AirQualityData datum : data) {
+            hour.add(String.valueOf(datum.getHour()));
+            dataList_10.add(datum.getPm10());
+            dataList_2_5.add(datum.getPm2_5());
+            dataList_1_0.add(datum.getPm1_0());
+        }
+
+
+        // put data sets into datalist
+        ArrayList<ArrayList<Integer>> dataLists = new ArrayList<>();
+        dataLists.add(dataList_10);
+        dataLists.add(dataList_2_5);
+        dataLists.add(dataList_1_0);
+
+
+        //put data sets into datalist
+        ArrayList<ArrayList<Integer>> dataLists = new ArrayList<>();
+
+        //draw line graph
+        lineView.setDrawDotLine(true);
+        lineView.setShowPopup(LineView.ShOW_POPUPS_NONE);
+        lineView.setColorArray(new int[]{
+                Color.parseColor("e74c3c") , Color.parseColor("#2980b9"), Color.parseColor(("1abc9c"))
+        });
+
+        lineView.setBottomTextList(hour);
+        lineView.setDataList(dataLists);
+        */
+
+
     }
+
+
 
     //Getting the scan results
 
@@ -97,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
+
            //qrcode 가 없으면
            /*String address = "www.naver.com"; //obj.getString("address");// 주소 받아오기
             Intent intent_1 = new Intent(MainActivity.this, pWebView.class);
