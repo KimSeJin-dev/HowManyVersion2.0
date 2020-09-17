@@ -17,13 +17,17 @@ public class PeopleInformationAdapter extends RecyclerView.Adapter<PeopleInforma
 
     // 아이템 뷰를 저장하는 뷰홀더 클래스.
     public class ViewHolder extends RecyclerView.ViewHolder {
-        TextView textView1 ;
+        TextView textView_num;
+        TextView textView_nick;
+        TextView textView_time;
 
         ViewHolder(View itemView) {
             super(itemView) ;
 
             // 뷰 객체에 대한 참조. (hold strong reference)
-            textView1 = itemView.findViewById(R.id.person_information) ;
+            textView_num = itemView.findViewById(R.id.person_num) ;
+            textView_nick = itemView.findViewById(R.id.person_nick) ;
+            textView_time = itemView.findViewById(R.id.person_time) ;
         }
     }
 
@@ -48,7 +52,9 @@ public class PeopleInformationAdapter extends RecyclerView.Adapter<PeopleInforma
     @Override
     public void onBindViewHolder(PeopleInformationAdapter.ViewHolder holder, int position) {
         String text = mData.get(position) ;
-        holder.textView1.setText(text) ;
+        holder.textView_num.setText(text) ;
+        holder.textView_nick.setText(text) ;
+        holder.textView_time.setText(text) ;
     }
 
     // getItemCount() - 전체 데이터 갯수 리턴.

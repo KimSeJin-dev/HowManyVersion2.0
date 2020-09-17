@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -22,6 +24,11 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+   // private DatabaseReference mDatabase;// 파이어베이스 연결
+
+
+
 
     private static final String TAG = "MyTAG";
     //view Objects
@@ -36,25 +43,28 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //mDatabase = FirebaseDatabase.getInstance().getReference(); //파이어베이스 연결
 
 
         // 리사이클러뷰에 표시할 데이터 리스트 생성.
         ArrayList<String> list = new ArrayList<>();
         for (int i=0; i<100; i++) {
-            list.add(String.format("사람정보 %d", i)) ;
+            list.add(String.format("번호 %d ", i)) ;
+            list.add(String.format("김세진 %d ", i)) ;
+            list.add(String.format("1시간 32분 %d ", i)) ;
+
         }
 
         // 리사이클러뷰에 LinearLayoutManager 객체 지정.
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView) ;
-        recyclerView.addItemDecoration(new DividerItemDecoration(getApplicationContext(), DividerItemDecoration.VERTICAL));
         //구분선
         recyclerView.setLayoutManager(new LinearLayoutManager(this)) ;
 
         // 리사이클러뷰에 SimpleTextAdapter 객체 지정.
         PeopleInformationAdapter adapter = new PeopleInformationAdapter(list) ;
         recyclerView.setAdapter(adapter) ;
+
 
         /*
         리사이클러뷰 객체만들기

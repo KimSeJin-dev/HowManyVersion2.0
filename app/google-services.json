@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "445576766411",
+    "firebase_url": "https://howmany-4b838.firebaseio.com",
+    "project_id": "howmany-4b838",
+    "storage_bucket": "howmany-4b838.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445576766411:android:273001e2bb1e31c133cc4e",
+        "android_client_info": {
+          "package_name": "com.example.howmany"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "445576766411-8sd85cfhnrqreecc36dlrm9l5dg737t2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7X6pQeNbpv4z9LeyzZrrIm2EZU0CZVDQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "445576766411-8sd85cfhnrqreecc36dlrm9l5dg737t2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
