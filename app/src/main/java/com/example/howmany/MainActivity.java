@@ -1,6 +1,10 @@
 package com.example.howmany;
 
+import android.content.Context;
 import android.content.Intent;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -9,13 +13,20 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -24,18 +35,22 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
+
 import im.dacer.androidcharts.LineView;
 import im.dacer.androidcharts.BarView;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MyTag";
+    private static final String TAG = "MyTag"; //로그 내용 보기
+    private FirebaseDatabase mDatabase;
+    private DatabaseReference mReference;
+    private ChildEventListener mChild;
 
-  //  private FirebaseDatabase mFirebaseDatabase = FirebaseDatabase.getInstance();
-   // private DatabaseReference mDatabaseReference = mFirebaseDatabase.getReference().child("information");
-
-
-
+    private RecyclerView recyclerView;
+    private PeopleInformationAdapter adapter; // 파이어베이스 어댑터 세팅
+    List<Object> Array = new ArrayList<Object>();
     private LineView lineView;
+
     //view Objects
     private Button buttonScan;
     private TextView textViewName, textViewAddress, textViewResult;
@@ -43,40 +58,61 @@ public class MainActivity extends AppCompatActivity {
     //qr code scanner object
     private IntentIntegrator qrScan;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 리사이클러뷰에 LinearLayoutManager 객체 지정.
+        final RecyclerView recyclerView = findViewById(R.id.recyclerView) ;
 
+        initDatabase();
 
+        ArrayList<String> list = new ArrayList<>();
 
+        // 리사이클러뷰에 SimpleTextAdapter 객체 지정.
+        final PeopleInformationAdapter adapter = new PeopleInformationAdapter(list) ;
+        recyclerView.setAdapter(adapter) ;
 
+        mReference = mDatabase.getReference("information");
+        mReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
+                for(DataSnapshot messageData : dataSnapshot.getChildren()){
+                    String msg2 = messageData.getValue().toString();
+                    Array.add(msg2);
+            //        adapter.add(msg2);
+                }
+                adapter.notifyDataSetChanged();
+               // recyclerView.setSelected(adapter.getItemCount());
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
 
 
 
 
 
         // 리사이클러뷰에 표시할 데이터 리스트 생성.
-        ArrayList<String> list = new ArrayList<>();
+        /*
         for (int i=0; i<100; i++) {
             list.add(String.format("번호 %d ", i)) ;
             list.add(String.format("김세진 %d ", i)) ;
             list.add(String.format("1시간 32분 %d ", i)) ;
 
         }
+        */
 
-        // 리사이클러뷰에 LinearLayoutManager 객체 지정.
 
-        RecyclerView recyclerView = findViewById(R.id.recyclerView) ;
+
         //구분선
-        recyclerView.setLayoutManager(new LinearLayoutManager(this)) ;
+        //recyclerView.setLayoutManager(new LinearLayoutManager(this)) ;
 
-        // 리사이클러뷰에 SimpleTextAdapter 객체 지정.
-        PeopleInformationAdapter adapter = new PeopleInformationAdapter(list) ;
-        recyclerView.setAdapter(adapter) ;
 
 
         /*
@@ -150,7 +186,45 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void initDatabase() {
+        mDatabase = FirebaseDatabase.getInstance();
+        mReference = mDatabase.getReference("information");
 
+
+        mChild = new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        };
+        mReference.addChildEventListener(mChild);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mReference.removeEventListener(mChild);
+    }
 
     //Getting the scan results
 
@@ -198,6 +272,65 @@ public class MainActivity extends AppCompatActivity {
 
         } else {
             super.onActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+
+
+
+
+    public class PeopleInformationAdapter extends RecyclerView.Adapter<PeopleInformationAdapter.ViewHolder> {
+
+        private ArrayList<String> mData = null ;
+
+
+        // 아이템 뷰를 저장하는 뷰홀더 클래스.
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            TextView textView_num;
+            TextView textView_nick;
+            TextView textView_time;
+
+            ViewHolder(View itemView) {
+                super(itemView) ;
+
+                // 뷰 객체에 대한 참조. (hold strong reference)
+                textView_num = itemView.findViewById(R.id.person_num) ;
+                textView_nick = itemView.findViewById(R.id.person_nick) ;
+                textView_time = itemView.findViewById(R.id.person_time) ;
+            }
+        }
+
+        // 생성자에서 데이터 리스트 객체를 전달받음.
+        PeopleInformationAdapter(ArrayList<String> list) {
+            mData = list ;
+        }
+
+        // onCreateViewHolder() - 아이템 뷰를 위한 뷰홀더 객체 생성하여 리턴.
+        @Override
+        public PeopleInformationAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            Context context = parent.getContext() ;
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) ;
+
+            View view = inflater.inflate(R.layout.information_recyclerview_item, parent, false) ;
+            PeopleInformationAdapter.ViewHolder vh = new PeopleInformationAdapter.ViewHolder(view) ;
+
+            return vh ;
+        }
+
+        // onBindViewHolder() - position에 해당하는 데이터를 뷰홀더의 아이템뷰에 표시.
+        @Override
+        public void onBindViewHolder(PeopleInformationAdapter.ViewHolder holder, int position) {
+            String text = mData.get(position) ;
+
+            holder.textView_num.setText(text) ;
+            holder.textView_nick.setText(text) ;
+            holder.textView_time.setText(text) ;
+        }
+
+        // getItemCount() - 전체 데이터 갯수 리턴.
+        @Override
+        public int getItemCount() {
+            return mData.size() ;
         }
     }
 }
