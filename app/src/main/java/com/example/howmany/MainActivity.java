@@ -1,16 +1,13 @@
 package com.example.howmany;
 
-import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -18,126 +15,136 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import im.dacer.androidcharts.LineView;
-import im.dacer.androidcharts.BarView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class MainActivity extends AppCompatActivity {
-    private static final String TAG = "MyTag"; //로그 내용 보기
-    private FirebaseDatabase mDatabase;
-    private DatabaseReference mReference;
-    private ChildEventListener mChild;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+    /*-------------------------------------------------*/
+    private final String TAG = getClass().getSimpleName();
+    ArrayList<PeopleList> arrayList = new ArrayList<>();
+    //server의 url을 적어준다.
+    private final String BASE_URL = "http://emoclew.pythonanywhere.com";
+    private MyAPI mMyAPI;
 
-    private RecyclerView recyclerView;
-    private PeopleInformationAdapter adapter; // 파이어베이스 어댑터 세팅
-    List<Object> Array = new ArrayList<Object>();
-    private LineView lineView;
+    private TextView mListTv;
+    // 웹서버 관련 코드
+    /*-------------------------------------------------*/
+
 
     //view Objects
     private Button buttonScan;
+    private Button mliveCount;
     private TextView textViewName, textViewAddress, textViewResult;
-
     //qr code scanner object
     private IntentIntegrator qrScan;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // 리사이클러뷰에 LinearLayoutManager 객체 지정.
-        final RecyclerView recyclerView = findViewById(R.id.recyclerView) ;
 
-        initDatabase();
 
-        ArrayList<String> list = new ArrayList<>();
+        mliveCount = findViewById(R.id.livecount);
+        mliveCount.setOnClickListener(this);
 
-        // 리사이클러뷰에 SimpleTextAdapter 객체 지정.
-        final PeopleInformationAdapter adapter = new PeopleInformationAdapter(list) ;
-        recyclerView.setAdapter(adapter) ;
+        initMyAPI(BASE_URL);
 
-        mReference = mDatabase.getReference("information");
-        mReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
-                for(DataSnapshot messageData : dataSnapshot.getChildren()){
-                    String msg2 = messageData.getValue().toString();
-                    Array.add(msg2);
-            //        adapter.add(msg2);
+        RecyclerView recyclerView = findViewById(R.id.recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        final CustomAdapter customAdapter = new CustomAdapter();
+        recyclerView.setAdapter(customAdapter);
+
+
+            Log.d(TAG, "Test01");
+            Call<List<PostItem>> getCall = mMyAPI.get_posts();
+            Log.d(TAG, "Test02");
+            getCall.enqueue(new Callback<List<PostItem>>() {
+                @Override
+                public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
+                    if (response.isSuccessful()) {
+                        Log.d(TAG, "Test03");
+                        List<PostItem> mList = response.body();
+                        Log.d(TAG, "Test04");
+
+                        arrayList.clear();
+                        for (PostItem item : mList) {
+                            Log.d(TAG, "Test05");
+                            PeopleList peopleList = new PeopleList();
+                            Log.d(TAG, "Test06");
+                            peopleList.setName(item.getName());
+                            Log.d(TAG, "Test07");
+                            peopleList.setMajor(item.getMajor());
+                            Log.d(TAG, "Test08");
+                            peopleList.setPhone_num(item.getPhone_num());
+                            Log.d(TAG, "Test09");
+                            arrayList.add(peopleList);
+                            Log.d(TAG, "Test10");
+
+                            Log.d(TAG, "Fxxking");
+
+                        }
+                        customAdapter.notifyDataSetChanged();
+
+
+                    } else {
+                        Log.d(TAG, "Status Code : " + response.code());
+                    }
                 }
-                adapter.notifyDataSetChanged();
-               // recyclerView.setSelected(adapter.getItemCount());
-            }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
+                @Override
+                public void onFailure(Call<List<PostItem>> call, Throwable t) {
 
-            }
-        });
+                }
+            });
+            final SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.refresh_layout);
+            swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                @Override
+                public void onRefresh() {
 
+                    customAdapter.notifyDataSetChanged();
+                    //swipeRefreshLayout.isRefreshing(true);
+                }
+            });
 
-
-
-
-        // 리사이클러뷰에 표시할 데이터 리스트 생성.
-        /*
-        for (int i=0; i<100; i++) {
-            list.add(String.format("번호 %d ", i)) ;
-            list.add(String.format("김세진 %d ", i)) ;
-            list.add(String.format("1시간 32분 %d ", i)) ;
-
-        }
-        */
 
 
 
         //구분선
         //recyclerView.setLayoutManager(new LinearLayoutManager(this)) ;
 
-
-
-        /*
-        리사이클러뷰 객체만들기
-        */
-
         //View Objects
         buttonScan = (Button) findViewById(R.id.buttonScan);
+        buttonScan.setOnClickListener(this);
+
+
+
+
+
         //intializing scan object
-        qrScan = new IntentIntegrator(this);
 
         //button onClick
-        // qr코드 스캐너 버튼시
-        buttonScan.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                //scan option
-                qrScan.setPrompt("Scanning...");
-                qrScan.setOrientationLocked(false);
-                qrScan.initiateScan();
-            }
-        });
-
-
-
-
 
         /*
         lineView = (LineView) findViewById(R.id.line_view);
@@ -183,47 +190,39 @@ public class MainActivity extends AppCompatActivity {
         lineView.setDataList(dataLists);
         */
 
-
     }
 
-    private void initDatabase() {
-        mDatabase = FirebaseDatabase.getInstance();
-        mReference = mDatabase.getReference("information");
 
+    /*-------------------------------------------------*/
+    private void initMyAPI(String baseUrl){
 
-        mChild = new ChildEventListener() {
-            @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+        Log.d(TAG,"initMyAPI : " + baseUrl);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        };
-        mReference.addChildEventListener(mChild);
+        mMyAPI = retrofit.create(MyAPI.class);
     }
+    //Retrofit 객체를 생성하고 이 객체를 이용해서, API service를 create 해준다.
+
+
+    /*-------------------------------------------------*/
+
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mReference.removeEventListener(mChild);
+    public void onClick(View v) {
+        if( v == buttonScan) { //qr코드 버튼 클릭시
+            //scan option
+            qrScan = new IntentIntegrator(this);
+            qrScan.setPrompt("Scanning...");
+            qrScan.setOrientationLocked(false);
+            qrScan.initiateScan();
+        }
+
+        else if( v == mliveCount){
+
+        }
     }
 
     //Getting the scan results
@@ -242,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
             */
             if (result.getContents() == null) {
                 Log.d(TAG,"테스트0");
-                String address = "http://www.naver.com"; //obj.getString("address");// 주소 받아오기
+                String address = "http://emoclew.pythonanywhere.com/"; //obj.getString("address");// 주소 받아오기
                 Intent intent_1 = new Intent(MainActivity.this, pWebView.class);
                 intent_1.putExtra("webview_addr",address);
                 startActivity(intent_1);
@@ -276,61 +275,47 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> { // 리사이클러뷰
 
 
-
-    public class PeopleInformationAdapter extends RecyclerView.Adapter<PeopleInformationAdapter.ViewHolder> {
-
-        private ArrayList<String> mData = null ;
-
-
-        // 아이템 뷰를 저장하는 뷰홀더 클래스.
-        public class ViewHolder extends RecyclerView.ViewHolder {
-            TextView textView_num;
-            TextView textView_nick;
-            TextView textView_time;
-
-            ViewHolder(View itemView) {
-                super(itemView) ;
-
-                // 뷰 객체에 대한 참조. (hold strong reference)
-                textView_num = itemView.findViewById(R.id.person_num) ;
-                textView_nick = itemView.findViewById(R.id.person_nick) ;
-                textView_time = itemView.findViewById(R.id.person_time) ;
-            }
-        }
-
-        // 생성자에서 데이터 리스트 객체를 전달받음.
-        PeopleInformationAdapter(ArrayList<String> list) {
-            mData = list ;
-        }
-
-        // onCreateViewHolder() - 아이템 뷰를 위한 뷰홀더 객체 생성하여 리턴.
+        @NonNull
         @Override
-        public PeopleInformationAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            Context context = parent.getContext() ;
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) ;
-
-            View view = inflater.inflate(R.layout.information_recyclerview_item, parent, false) ;
-            PeopleInformationAdapter.ViewHolder vh = new PeopleInformationAdapter.ViewHolder(view) ;
-
-            return vh ;
+        public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.information_recyclerview_item, parent, false);
+            return new CustomViewHolder(view);
         }
 
-        // onBindViewHolder() - position에 해당하는 데이터를 뷰홀더의 아이템뷰에 표시.
         @Override
-        public void onBindViewHolder(PeopleInformationAdapter.ViewHolder holder, int position) {
-            String text = mData.get(position) ;
+        public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
 
-            holder.textView_num.setText(text) ;
-            holder.textView_nick.setText(text) ;
-            holder.textView_time.setText(text) ;
+            ((CustomViewHolder) holder).person_name.setText(arrayList.get(position).getName());
+            ((CustomViewHolder) holder).person_major.setText(arrayList.get(position).getMajor());
+            ((CustomViewHolder) holder).person_phone_num.setText(arrayList.get(position).getPhone_num());
+
+
+
         }
 
-        // getItemCount() - 전체 데이터 갯수 리턴.
         @Override
         public int getItemCount() {
-            return mData.size() ;
+            return arrayList.size();
+        }
+
+        private class CustomViewHolder extends RecyclerView.ViewHolder {
+
+            TextView person_name;
+            TextView person_major;
+            TextView person_phone_num;
+
+            public CustomViewHolder(View view) {
+                super(view);
+                person_name = (TextView) view.findViewById(R.id.person_name);
+                person_major = (TextView) view.findViewById(R.id.person_major);
+                person_phone_num = (TextView) view.findViewById(R.id.person_phone_num);
+
+
+            }
         }
     }
+
 }

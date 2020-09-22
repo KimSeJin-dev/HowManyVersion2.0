@@ -16,7 +16,7 @@
         android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/person_num"
+        android:id="@+id/person_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="15sp"
@@ -24,7 +24,7 @@
         android:fontFamily="@font/maplestorylight"/>
 
     <TextView
-        android:id="@+id/person_nick"
+        android:id="@+id/person_major"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="15sp"
@@ -32,7 +32,7 @@
         android:fontFamily="@font/maplestorylight"/>
 
     <TextView
-        android:id="@+id/person_time"
+        android:id="@+id/person_phone_num"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="15sp"

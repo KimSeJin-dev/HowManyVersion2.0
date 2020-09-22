@@ -25,9 +25,9 @@ import java.util.Collections;
  * Edited by dector 30-Jun-2014
  */
 public class LineView extends View {
-    public static final int SHOW_POPUPS_All = 1;
-    public static final int SHOW_POPUPS_MAXMIN_ONLY = 2;
-    public static final int SHOW_POPUPS_NONE = 3;
+    public static final int SHOW_POPUPS_All = 1; //모든 데이터 값을 보여줌
+    public static final int SHOW_POPUPS_MAXMIN_ONLY = 2; //최솟값, 최대값만 보여줌
+    public static final int SHOW_POPUPS_NONE = 3; // 아무것도 보여주지 않음
     private final int bottomTriangleHeight = 12;
     private final int popupTopPadding = MyUtils.dip2px(getContext(), 2);
     private final int popupBottomMargin = MyUtils.dip2px(getContext(), 5);
@@ -115,11 +115,11 @@ public class LineView extends View {
 
     public void setShowPopup(int popupType) {
         this.showPopupType = popupType;
-    }
+    } // 마커
 
     public void setDrawDotLine(Boolean drawDotLine) {
         this.drawDotLine = drawDotLine;
-    }
+    } //사진 상의 흰 보조선
 
     public void setColorArray(int[] colors) {
         this.colorArray = colors;
