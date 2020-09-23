@@ -101,6 +101,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             peopleList.setId(item.getId());
                             peopleList.setName(item.getName());
                             peopleList.setMajor(item.getMajor());
+                            convertUtc2Local(item.getEnter_time());
+                            Log.d(TAG, "test 01 " + convertUtc2Local(item.getEnter_time()));
+                            peopleList.setEnter_time(convertUtc2Local(item.getEnter_time()));
 
                             // peopleList.setEnter_time(item.getEnter_time()); 시간 utc 형식으로 변환
                             arrayList.add(peopleList);
@@ -220,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static String convertUtc2Local(String utcTime) {
         String time = "";
         if (utcTime != null) {
-            SimpleDateFormat utcFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.CHINA);
+            SimpleDateFormat utcFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
             utcFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
             Date gpsUTCDate = null;
             try {
@@ -228,7 +231,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            SimpleDateFormat localFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+            SimpleDateFormat localFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
             localFormatter.setTimeZone(TimeZone.getDefault());
             assert gpsUTCDate != null;
             time = localFormatter.format(gpsUTCDate.getTime());
