@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
@@ -28,6 +29,8 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -48,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // 웹서버 관련 코드
     /*-------------------------------------------------*/
 
-
+    public static WebView mWebView;
     //view Objects
     private Button buttonScan;
     private Button mliveCount;
@@ -57,13 +60,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private IntentIntegrator qrScan;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+        mWebView = findViewById(R.id.webView);
 
         mliveCount = findViewById(R.id.livecount);
         mliveCount.setOnClickListener(this);
@@ -77,38 +79,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setAdapter(customAdapter);
 
 
-            Log.d(TAG, "Test01");
             Call<List<PostItem>> getCall = mMyAPI.get_posts();
-            Log.d(TAG, "Test02");
             getCall.enqueue(new Callback<List<PostItem>>() {
                 @Override
                 public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
                     if (response.isSuccessful()) {
-                        Log.d(TAG, "Test03");
-                        List<PostItem> mList = response.body();
-                        Log.d(TAG, "Test04");
 
+                        List<PostItem> mList = response.body();
                         arrayList.clear();
                         for (PostItem item : mList) {
-                            Log.d(TAG, "Test05");
-                            PeopleList peopleList = new PeopleList();
-                            Log.d(TAG, "Test06");
-                            peopleList.setName(item.getName());
-                            Log.d(TAG, "Test07");
-                            peopleList.setMajor(item.getMajor());
-                            Log.d(TAG, "Test08");
-                            peopleList.setPhone_num(item.getPhone_num());
-                            Log.d(TAG, "Test09");
-                            arrayList.add(peopleList);
-                            Log.d(TAG, "Test10");
 
-                            Log.d(TAG, "Fxxking");
+                            PeopleList peopleList = new PeopleList();
+                            peopleList.setId(item.getId());
+                            peopleList.setName(item.getName());
+                            peopleList.setMajor(item.getMajor());
+                            peopleList.setEnter_time(item.getEnter_time());
+                            arrayList.add(peopleList);
 
                         }
                         customAdapter.notifyDataSetChanged();
-
-
-                    } else {
+                        } else {
                         Log.d(TAG, "Status Code : " + response.code());
                     }
                 }
@@ -123,13 +113,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 @Override
                 public void onRefresh() {
 
+                    Call<List<PostItem>> getCall = mMyAPI.get_posts();
+                    getCall.enqueue(new Callback<List<PostItem>>() {
+                        @Override
+                        public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
+                            if (response.isSuccessful()) {
+                                List<PostItem> mList = response.body();
+                                arrayList.clear();
+
+                                for (PostItem item : mList) {
+
+
+                                    PeopleList peopleList = new PeopleList();
+                                    peopleList.setId(item.getId());
+                                    peopleList.setName(item.getName());
+                                    peopleList.setMajor(item.getMajor());
+                                    peopleList.setEnter_time(item.getEnter_time().substring(11,12) + "시" + item.getEnter_time().substring(14,15) + "분" + item.getEnter_time().substring(17,18) + "초");
+
+                                    arrayList.add(peopleList);
+
+
+
+                                }
+                                customAdapter.notifyDataSetChanged();
+                            } else {
+                                Log.d(TAG, "Status Code : " + response.code());
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<PostItem>> call, Throwable t) {
+
+                        }
+                    });
+
+
                     customAdapter.notifyDataSetChanged();
-                    //swipeRefreshLayout.isRefreshing(true);
+                    swipeRefreshLayout.setRefreshing(false);
                 }
             });
-
-
-
 
         //구분선
         //recyclerView.setLayoutManager(new LinearLayoutManager(this)) ;
@@ -249,12 +271,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             } else {
                 //qrcode 결과가 있으면
-                Log.d(TAG,"테스트1");
                 Toast.makeText(MainActivity.this, "Scan Perfect", Toast.LENGTH_SHORT).show();
                 try {
                     //data를 json으로 변환
-                    Log.d(TAG,"테스트2");
-                    JSONObject obj = new JSONObject(result.getContents());
+                     JSONObject obj = new JSONObject(result.getContents());
                     textViewName.setText(obj.getString("name"));
                     textViewAddress.setText(obj.getString("address"));
                     String address_1 = "m.naver.com"; //obj.getString("address");// 주소 받아오기
@@ -287,10 +307,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
-
+//          ((CustomViewHolder) holder).person_id.setText(arrayList.get(position).getId());
             ((CustomViewHolder) holder).person_name.setText(arrayList.get(position).getName());
             ((CustomViewHolder) holder).person_major.setText(arrayList.get(position).getMajor());
-            ((CustomViewHolder) holder).person_phone_num.setText(arrayList.get(position).getPhone_num());
+            ((CustomViewHolder) holder).person_enter_time.setText(arrayList.get(position).getEnter_time());
 
 
 
@@ -302,16 +322,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         private class CustomViewHolder extends RecyclerView.ViewHolder {
-
+            TextView person_id;
             TextView person_name;
             TextView person_major;
-            TextView person_phone_num;
+            TextView person_enter_time;
 
             public CustomViewHolder(View view) {
                 super(view);
+                person_id = (TextView) view.findViewById(R.id.person_id);
                 person_name = (TextView) view.findViewById(R.id.person_name);
                 person_major = (TextView) view.findViewById(R.id.person_major);
-                person_phone_num = (TextView) view.findViewById(R.id.person_phone_num);
+                person_enter_time = (TextView) view.findViewById(R.id.person_enter_time);
 
 
             }
