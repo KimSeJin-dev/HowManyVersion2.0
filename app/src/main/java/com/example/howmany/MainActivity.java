@@ -28,10 +28,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.sql.Time;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Random;
+import java.util.TimeZone;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -70,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mliveCount = findViewById(R.id.livecount);
         mliveCount.setOnClickListener(this);
 
+        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         initMyAPI(BASE_URL);
 
 
@@ -93,9 +101,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             peopleList.setId(item.getId());
                             peopleList.setName(item.getName());
                             peopleList.setMajor(item.getMajor());
-                            peopleList.setEnter_time(item.getEnter_time());
-                            arrayList.add(peopleList);
 
+                            // peopleList.setEnter_time(item.getEnter_time()); 시간 utc 형식으로 변환
+                            arrayList.add(peopleList);
                         }
                         customAdapter.notifyDataSetChanged();
                         } else {
@@ -122,19 +130,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 arrayList.clear();
 
                                 for (PostItem item : mList) {
-
-
                                     PeopleList peopleList = new PeopleList();
                                     peopleList.setId(item.getId());
                                     peopleList.setName(item.getName());
                                     peopleList.setMajor(item.getMajor());
-                                    peopleList.setEnter_time(item.getEnter_time().substring(11,12) + "시" + item.getEnter_time().substring(14,15) + "분" + item.getEnter_time().substring(17,18) + "초");
+                                    convertUtc2Local(item.getEnter_time());
+                                    peopleList.setEnter_time(convertUtc2Local(item.getEnter_time()));
+                                 // 랜덤 닉네임 함수 할생각임   Random random = new Random();
 
                                     arrayList.add(peopleList);
-
-
-
-                                }
+                            }
                                 customAdapter.notifyDataSetChanged();
                             } else {
                                 Log.d(TAG, "Status Code : " + response.code());
@@ -147,8 +152,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     });
 
-
-                    customAdapter.notifyDataSetChanged();
                     swipeRefreshLayout.setRefreshing(false);
                 }
             });
@@ -214,6 +217,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    public static String convertUtc2Local(String utcTime) {
+        String time = "";
+        if (utcTime != null) {
+            SimpleDateFormat utcFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.CHINA);
+            utcFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
+            Date gpsUTCDate = null;
+            try {
+                gpsUTCDate = utcFormatter.parse(utcTime);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            SimpleDateFormat localFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+            localFormatter.setTimeZone(TimeZone.getDefault());
+            assert gpsUTCDate != null;
+            time = localFormatter.format(gpsUTCDate.getTime());
+        }
+        return time;
+
+    }
 
     /*-------------------------------------------------*/
     private void initMyAPI(String baseUrl){
@@ -307,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
-//          ((CustomViewHolder) holder).person_id.setText(arrayList.get(position).getId());
+            ((CustomViewHolder) holder).person_id.setText(arrayList.get(position).getId());
             ((CustomViewHolder) holder).person_name.setText(arrayList.get(position).getName());
             ((CustomViewHolder) holder).person_major.setText(arrayList.get(position).getMajor());
             ((CustomViewHolder) holder).person_enter_time.setText(arrayList.get(position).getEnter_time());
