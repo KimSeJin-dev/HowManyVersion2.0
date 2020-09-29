@@ -47,23 +47,16 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    /*-------------------------------------------------*/
+
     private final String TAG = getClass().getSimpleName();
     ArrayList<PeopleList> arrayList = new ArrayList<>();
-    //server의 url을 적어준다.
     private final String BASE_URL = "http://emoclew.pythonanywhere.com";
     private MyAPI mMyAPI;
-
     private TextView mListTv;
-    // 웹서버 관련 코드
-    /*-------------------------------------------------*/
-
     public static WebView mWebView;
-    //view Objects
     private Button buttonScan;
     private Button mliveCount;
     private TextView textViewName, textViewAddress, textViewResult;
-    //qr code scanner object
     private IntentIntegrator qrScan;
 
 
@@ -77,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mliveCount = findViewById(R.id.livecount);
         mliveCount.setOnClickListener(this);
 
-        final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         initMyAPI(BASE_URL);
 
 
@@ -101,11 +94,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             peopleList.setId(item.getId());
                             peopleList.setName(item.getName());
                             peopleList.setMajor(item.getMajor());
-                            convertUtc2Local(item.getEnter_time());
-                            Log.d(TAG, "test 01 " + convertUtc2Local(item.getEnter_time()));
-                            peopleList.setEnter_time(convertUtc2Local(item.getEnter_time()));
-
-                            // peopleList.setEnter_time(item.getEnter_time()); 시간 utc 형식으로 변환
+                          //  peopleList.setEnter_time(getDateTimeAddLocalTimezone(item.getEnter_time()));
                             arrayList.add(peopleList);
                         }
                         customAdapter.notifyDataSetChanged();
@@ -137,10 +126,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     peopleList.setId(item.getId());
                                     peopleList.setName(item.getName());
                                     peopleList.setMajor(item.getMajor());
-                                    convertUtc2Local(item.getEnter_time());
-                                    peopleList.setEnter_time(convertUtc2Local(item.getEnter_time()));
-                                 // 랜덤 닉네임 함수 할생각임   Random random = new Random();
-
+                                   // peopleList.setEnter_time(getDateTimeAddLocalTimezone(item.getEnter_time()));
                                     arrayList.add(peopleList);
                             }
                                 customAdapter.notifyDataSetChanged();
@@ -159,88 +145,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
 
-        //구분선
-        //recyclerView.setLayoutManager(new LinearLayoutManager(this)) ;
 
-        //View Objects
         buttonScan = (Button) findViewById(R.id.buttonScan);
         buttonScan.setOnClickListener(this);
 
 
-
-
-
-        //intializing scan object
-
-        //button onClick
-
-        /*
-        lineView = (LineView) findViewById(R.id.line_view);
-
-        //list data
-        List<AirQualityData> data = db.todayAirQualityData();
-
-        //lable
-        ArrayList<String> hour = new ArrayList<String>();
-        //3 data sets
-
-        ArrayList<Integer> dataList_10 = new ArrayList<>();
-        ArrayList<Integer> dataList_2_5 = new ArrayList<>();
-        ArrayList<Integer> dataList_1_0 = new ArrayList<>();
-
-        //put db data into arrays
-        for(AirQualityData datum : data) {
-            hour.add(String.valueOf(datum.getHour()));
-            dataList_10.add(datum.getPm10());
-            dataList_2_5.add(datum.getPm2_5());
-            dataList_1_0.add(datum.getPm1_0());
-        }
-
-
-        // put data sets into datalist
-        ArrayList<ArrayList<Integer>> dataLists = new ArrayList<>();
-        dataLists.add(dataList_10);
-        dataLists.add(dataList_2_5);
-        dataLists.add(dataList_1_0);
-
-
-        //put data sets into datalist
-        ArrayList<ArrayList<Integer>> dataLists = new ArrayList<>();
-
-        //draw line graph
-        lineView.setDrawDotLine(true);
-        lineView.setShowPopup(LineView.ShOW_POPUPS_NONE);
-        lineView.setColorArray(new int[]{
-                Color.parseColor("e74c3c") , Color.parseColor("#2980b9"), Color.parseColor(("1abc9c"))
-        });
-
-        lineView.setBottomTextList(hour);
-        lineView.setDataList(dataLists);
-        */
-
     }
 
-    public static String convertUtc2Local(String utcTime) {
-        String time = "";
-        if (utcTime != null) {
-            SimpleDateFormat utcFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
-            utcFormatter.setTimeZone(TimeZone.getTimeZone("UTC"));
-            Date gpsUTCDate = null;
-            try {
-                gpsUTCDate = utcFormatter.parse(utcTime);
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            SimpleDateFormat localFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
-            localFormatter.setTimeZone(TimeZone.getDefault());
-            assert gpsUTCDate != null;
-            time = localFormatter.format(gpsUTCDate.getTime());
-        }
-        return time;
-
-    }
-
-    /*-------------------------------------------------*/
     private void initMyAPI(String baseUrl){
 
         Log.d(TAG,"initMyAPI : " + baseUrl);
@@ -251,10 +162,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mMyAPI = retrofit.create(MyAPI.class);
     }
-    //Retrofit 객체를 생성하고 이 객체를 이용해서, API service를 create 해준다.
+
+    private static String format(String format, Date date)
+    {
+        SimpleDateFormat f = new SimpleDateFormat(format);
+        return f.format(date);
+    }
+
+//    public static String getDateTimeAddLocalTimezone(String date){
+//        Date d;
+//        try {
+//            d = new SimpleDateFormat(item.).parse(date);
+//            Time t = new Time();
+//            Long l = t.normalize(t.isDst==0); // -32400000밀리초
+//            Long between = l/1000/60/60; // -9시간
+//            d.setHours(d.getHours() - Long.valueOf(between).intValue());
+//            return format(formatDateTime, d);
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//        }
+//        return date;
+//
+//    }
 
 
-    /*-------------------------------------------------*/
 
 
     @Override
@@ -272,8 +203,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    //Getting the scan results
 
+    //Getting the scan results
     //qr코드 승인 , qr코드 없을시
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){

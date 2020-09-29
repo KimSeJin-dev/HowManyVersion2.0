@@ -43,13 +43,28 @@ public class pWebView extends AppCompatActivity {
     }
 
 
-    @Override
+   /* @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {//뒤로가기 버튼 이벤트
         if ((keyCode == KeyEvent.KEYCODE_BACK) && mWebView.canGoBack()) {//웹뷰에서 뒤로가기 버튼을 누르면 뒤로가짐
             mWebView.goBack();
             return true;
         }
         return super.onKeyDown(keyCode, event);
+    }
+    */
+
+
+    @Override
+    public void onBackPressed() {
+        if (mWebView.getUrl().equalsIgnoreCase(" http://emoclew.pythonanywhere.com")
+                || mWebView.getUrl().equalsIgnoreCase("http://emoclew.pythonanywhere.com/new/")
+        ) {
+            super.onBackPressed();
+        }else if(mWebView.canGoBack()){
+            mWebView.goBack();
+        }else{
+            super.onBackPressed();
+        }
     }
 
     private class WebViewClientClass extends WebViewClient {//페이지 이동

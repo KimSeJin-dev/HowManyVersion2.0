@@ -1,21 +1,26 @@
 package com.example.howmany;
 
-public class PostItem {  private String name; // 분반
+public class PostItem {
+    private String id; // 번호
+    private String name; // 분반
     private String major; // 학수번호
-    private String phone_num; // 수업이름
+    private String enter_time; // 수업이름
+
 
     public PostItem(){}
 
-    public PostItem(String name, String major, String phone_num){
+    public PostItem(String id , String name, String major, String enter_time){
+        this.id = id;
         this.name = name;
         this.major = major;
-        this.phone_num = phone_num;
+        this.enter_time = enter_time;
     }
+    public String getId() {return id;}
     public String getName() {return name;}
     public String getMajor() {
         return major;
     }
-    public String getPhone_num() {
-        return phone_num;
+    public String getEnter_time() {
+        return enter_time;
     }
 }

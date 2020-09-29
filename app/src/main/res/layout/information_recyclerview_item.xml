@@ -16,30 +16,38 @@
         android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/person_id"
+        android:layout_width="50dp"
+        android:layout_height="15dp"
+        android:textSize="15sp"
+        android:textColor="#FFFFFF"
+        android:fontFamily="@font/maplestorylight"/>
+
+    <TextView
         android:id="@+id/person_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="15dp"
         android:textSize="15sp"
         android:textColor="#FFFFFF"
         android:fontFamily="@font/maplestorylight"/>
 
     <TextView
         android:id="@+id/person_major"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="120dp"
+        android:layout_height="15dp"
         android:textSize="15sp"
         android:textColor="#FFFFFF"
         android:fontFamily="@font/maplestorylight"/>
 
     <TextView
-        android:id="@+id/person_phone_num"
-        android:layout_width="wrap_content"
+        android:id="@+id/person_enter_time"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="15sp"
+        android:fontFamily="@font/maplestorylight"
         android:textColor="#FFFFFF"
-        android:fontFamily="@font/maplestorylight" />
+        android:textSize="15sp" />
 
-    </LinearLayout>
+</LinearLayout>
 
 
 </androidx.cardview.widget.CardView>
