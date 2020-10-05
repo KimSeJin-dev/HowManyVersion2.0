@@ -15,10 +15,10 @@
             android:text="SCAN QR CODE" />
 
         <Button
-            android:text="실시간 숫자"
+            android:id="@+id/stopwatch"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/livecount"/>
+            android:text="StopWatch" />
 
         <HorizontalScrollView
             android:layout_height="wrap_content"

@@ -14,30 +14,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.HorizontalScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
-import java.sql.Time;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Random;
 import java.util.TimeZone;
 
 import retrofit2.Call;
@@ -55,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mListTv;
     public static WebView mWebView;
     private Button buttonScan;
-    private Button mliveCount;
+    private Button mStopWatch;
     private TextView textViewName, textViewAddress, textViewResult;
     private IntentIntegrator qrScan;
 
@@ -67,8 +57,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         mWebView = findViewById(R.id.webView);
 
-        mliveCount = findViewById(R.id.livecount);
-        mliveCount.setOnClickListener(this);
+        mStopWatch = findViewById(R.id.stopwatch);
+        mStopWatch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(
+                        getApplicationContext(),
+                        StopWatch.class);
+                startActivity(intent);
+            }
+        });
 
 
         initMyAPI(BASE_URL);
@@ -94,8 +92,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             peopleList.setId(item.getId());
                             peopleList.setName(item.getName());
                             peopleList.setMajor(item.getMajor());
-                          //  peopleList.setEnter_time(getDateTimeAddLocalTimezone(item.getEnter_time()));
+                            Log.d(TAG, "Test_ex" + item.getEnter_time());
+                            peopleList.setEnter_time(item.getEnter_time().substring(0,4) + "년" +
+                                    item.getEnter_time().substring(5,7) + "월 " +
+                                    item.getEnter_time().substring(8,10) + "일 " +
+                                    item.getEnter_time().substring(11,13) + "시 " +
+                                    item.getEnter_time().substring(14,16) + "분 " ); //2020-09-29T13:18:33
                             arrayList.add(peopleList);
+
                         }
                         customAdapter.notifyDataSetChanged();
                         } else {
@@ -126,7 +130,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     peopleList.setId(item.getId());
                                     peopleList.setName(item.getName());
                                     peopleList.setMajor(item.getMajor());
-                                   // peopleList.setEnter_time(getDateTimeAddLocalTimezone(item.getEnter_time()));
+
+                                    peopleList.setEnter_time(item.getEnter_time().substring(0,4) + "년" +
+                                            item.getEnter_time().substring(5,7) + "월 " +
+                                            item.getEnter_time().substring(8,10) + "일 " +
+                                            item.getEnter_time().substring(11,13) + "시 " +
+                                            item.getEnter_time().substring(14,16) + "분 "); //2020-09-29T13:18:33
+
                                     arrayList.add(peopleList);
                             }
                                 customAdapter.notifyDataSetChanged();
@@ -152,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
     private void initMyAPI(String baseUrl){
 
         Log.d(TAG,"initMyAPI : " + baseUrl);
@@ -163,27 +174,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mMyAPI = retrofit.create(MyAPI.class);
     }
 
-    private static String format(String format, Date date)
-    {
-        SimpleDateFormat f = new SimpleDateFormat(format);
-        return f.format(date);
-    }
+        	public static String utcToLocaltime(String datetime) throws Exception {
+        	    String locTime = null;
+        	    //TimeZone tz = TimeZone.getTimeZone("GMT+08:00"); 해당 국가 일시 확인 할 때, 한쿸은 +9
+        	    TimeZone tz = TimeZone.getDefault();
+        	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-//    public static String getDateTimeAddLocalTimezone(String date){
-//        Date d;
-//        try {
-//            d = new SimpleDateFormat(item.).parse(date);
-//            Time t = new Time();
-//            Long l = t.normalize(t.isDst==0); // -32400000밀리초
-//            Long between = l/1000/60/60; // -9시간
-//            d.setHours(d.getHours() - Long.valueOf(between).intValue());
-//            return format(formatDateTime, d);
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//        return date;
-//
-//    }
+        	    try {
+        	        Date parseDate = sdf.parse(datetime);
+        	        long milliseconds = parseDate.getTime();
+        	        int offset = tz.getOffset(milliseconds);
+        	        locTime = sdf.format(milliseconds + offset);
+        	        locTime = locTime.replace("+0000", "");
+        	    } catch(Exception e) {
+        	        e.printStackTrace();
+        	              }
+
+        	    return locTime;
+        	}
 
 
 
@@ -198,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             qrScan.initiateScan();
         }
 
-        else if( v == mliveCount){
+        else if( v == mStopWatch){
 
         }
     }
