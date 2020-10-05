@@ -42,11 +42,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     ArrayList<PeopleList> arrayList = new ArrayList<>();
     private final String BASE_URL = "http://emoclew.pythonanywhere.com";
     private MyAPI mMyAPI;
-    private TextView mListTv;
     public static WebView mWebView;
     private Button buttonScan;
     private Button mStopWatch;
-    private TextView textViewName, textViewAddress, textViewResult;
+
     private IntentIntegrator qrScan;
 
 
@@ -86,10 +85,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         List<PostItem> mList = response.body();
                         arrayList.clear();
+                        int num_1 = 1;
                         for (PostItem item : mList) {
 
                             PeopleList peopleList = new PeopleList();
-                            peopleList.setId(item.getId());
+                            peopleList.setId(num_1 + "번");
                             peopleList.setName(item.getName());
                             peopleList.setMajor(item.getMajor());
                             Log.d(TAG, "Test_ex" + item.getEnter_time());
@@ -99,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     item.getEnter_time().substring(11,13) + "시 " +
                                     item.getEnter_time().substring(14,16) + "분 " ); //2020-09-29T13:18:33
                             arrayList.add(peopleList);
+                            num_1++;
 
                         }
                         customAdapter.notifyDataSetChanged();
@@ -124,10 +125,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if (response.isSuccessful()) {
                                 List<PostItem> mList = response.body();
                                 arrayList.clear();
-
+                                int num = 1;
                                 for (PostItem item : mList) {
+
+
                                     PeopleList peopleList = new PeopleList();
-                                    peopleList.setId(item.getId());
+                                    peopleList.setId(num + "번");
                                     peopleList.setName(item.getName());
                                     peopleList.setMajor(item.getMajor());
 
@@ -138,8 +141,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             item.getEnter_time().substring(14,16) + "분 "); //2020-09-29T13:18:33
 
                                     arrayList.add(peopleList);
+                                    num++;
                             }
+
                                 customAdapter.notifyDataSetChanged();
+
                             } else {
                                 Log.d(TAG, "Status Code : " + response.code());
                             }
@@ -239,8 +245,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 try {
                     //data를 json으로 변환
                      JSONObject obj = new JSONObject(result.getContents());
-                    textViewName.setText(obj.getString("name"));
-                    textViewAddress.setText(obj.getString("address"));
                     String address_1 = "m.naver.com"; //obj.getString("address");// 주소 받아오기
                     Intent intent = new Intent(MainActivity.this, pWebView.class);
                     intent.putExtra("webview_addr",address_1);
@@ -249,7 +253,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } catch (JSONException e) {
                     e.printStackTrace();
                     //Toast.makeText(MainActivity.this, result.getContents(), Toast.LENGTH_LONG).show();
-                    textViewResult.setText(result.getContents());
                 }
             }
 
