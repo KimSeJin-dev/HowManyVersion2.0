@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager2.widget.ViewPager2;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -47,13 +48,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button mStopWatch;
 
     private IntentIntegrator qrScan;
-
+    ViewPager2 viewPager2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        viewPager2 = findViewById(R.id.viewPager2);
         mWebView = findViewById(R.id.webView);
 
         mStopWatch = findViewById(R.id.stopwatch);
@@ -66,6 +68,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             }
         });
+
+
+        ArrayList<DataPage> list = new ArrayList<>();
+        list.add(new DataPage(android.R.color.black,"요일별 그래프"));
+        list.add(new DataPage(android.R.color.holo_red_light, "시간별 그래프"));
+        list.add(new DataPage(android.R.color.holo_green_dark, "마이페이지"));
+
+        viewPager2.setAdapter(new ViewPagerAdapter(list));
+        viewPager2.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
 
 
         initMyAPI(BASE_URL);
@@ -260,6 +271,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
+
+
 
 
     public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> { // 리사이클러뷰
