@@ -2,6 +2,7 @@ package com.example.howmany;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,6 +11,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -29,10 +32,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class FragFirst extends Fragment {
 
+    private static final int SHOW_POPUPS_ALL = 1;
     private String TAG = "TAG";
     private MyAPI mMyAPI;
     private final String BASE_URL = "http://emoclew.pythonanywhere.com";
 
+    int Mon, Tue, Wed, Thu, Fri, Sat, Sun = 0;
 
     @Nullable
     @Override
@@ -45,7 +50,14 @@ public class FragFirst extends Fragment {
         initMyAPI(BASE_URL);
        initLineView(lineViewFloat);
        randomSet(lineViewFloat);
+        lineViewFloat.setShowPopup(LineView.SHOW_POPUPS_All);
+
+
+
+
         return rootView;
+
+
     }
 
 
@@ -69,7 +81,7 @@ public class FragFirst extends Fragment {
         lineView.setShowPopup(LineView.SHOW_POPUPS_NONE);
     }
 
-    private void randomSet(LineView lineViewFloat) {
+    private void randomSet(final LineView lineViewFloat) {
 
         Call<List<PostItem>> getCall = mMyAPI.get_posts();
         getCall.enqueue(new Callback<List<PostItem>>() {
@@ -81,9 +93,41 @@ public class FragFirst extends Fragment {
                     for (PostItem item : mList) {
                         String day = item.getEnter_time().substring(0,10);
                         String Date  = getDateDay(day);
-
-
+                        Log.d(TAG, "example : " + Date);
+                        if(Date == "월"){ Mon++; }
+                        else if(Date == "화"){ Tue++; }
+                        else if(Date == "수"){ Wed++; }
+                        else if(Date == "목"){ Thu++; }
+                        else if(Date == "금"){ Fri++; }
+                        else if(Date == "토"){ Sat++; }
+                        else if(Date == "일"){ Sun++; }
+                        Log.d(TAG, "example2 : " + Fri);
                     }
+
+
+                    ArrayList<Integer> dataListF = new ArrayList<>();
+                    dataListF.add(Mon);
+                    dataListF.add(Tue);
+                    dataListF.add(Wed);
+                    dataListF.add(Thu);
+                    dataListF.add(Fri);
+                    dataListF.add(Sat);
+                    dataListF.add(Sun);
+
+
+
+                    ArrayList<ArrayList<Integer>> dataListFs = new ArrayList<>();
+                    dataListFs.add(dataListF);
+
+                    lineViewFloat.setDataList(dataListFs);
+
+                    Mon = 0;
+                    Tue = 0;
+                    Wed = 0;
+                    Thu = 0;
+                    Fri = 0;
+                    Sat = 0;
+                    Sun = 0;
 
                 } else {
                     Log.d(TAG, "Status Code : " + response.code());
@@ -98,16 +142,7 @@ public class FragFirst extends Fragment {
 
 
 
-        ArrayList<Integer> dataListF = new ArrayList<>();
-        Random r = new Random();
-        for (int i = 0; i < 9; i++) {
-            dataListF.add(r.nextInt(10) + 1);
-        }
 
-        ArrayList<ArrayList<Integer>> dataListFs = new ArrayList<>();
-        dataListFs.add(dataListF);
-
-        lineViewFloat.setDataList(dataListFs);
     }
 
     private String getDateDay(String day){

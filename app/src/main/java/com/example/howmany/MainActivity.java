@@ -1,17 +1,7 @@
 package com.example.howmany;
 
+import android.app.FragmentManager;
 import android.content.Intent;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.ViewCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
-
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -21,6 +11,18 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.ViewCompat;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
@@ -34,7 +36,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
-import im.dacer.androidcharts.LineView;
 import me.relex.circleindicator.CircleIndicator3;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -52,6 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonScan;
     private Button mStopWatch;
 
+
     private ViewPager2 mPager;
     private FragmentStateAdapter pagerAdapter;
     private int num_page = 2;
@@ -59,10 +61,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private IntentIntegrator qrScan;
 
+    Fragment fragfirst;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        fragfirst = new FragFirst();
 
         //ViewPager2
         mPager = findViewById(R.id.viewpager);
@@ -77,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
         mPager.setCurrentItem(1000);
         mPager.setOffscreenPageLimit(3);
+
 
         mPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -163,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             num_1++;
 
                         }
-                        customAdapter.notifyDataSetChanged();
+                          customAdapter.notifyDataSetChanged();
                         } else {
                         Log.d(TAG, "Status Code : " + response.code());
                     }
@@ -178,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
+
 
                     Call<List<PostItem>> getCall = mMyAPI.get_posts();
                     getCall.enqueue(new Callback<List<PostItem>>() {
@@ -217,6 +225,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                         }
                     });
+
+                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.detach(fragfirst).attach(fragfirst).commit();
 
                     swipeRefreshLayout.setRefreshing(false);
                 }
