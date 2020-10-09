@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="40dp"
+    android:layout_height="60dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:cardCornerRadius="8dp"
-    app:cardBackgroundColor="@color/colorCrimson"
-    app:contentPadding="13dp"
+    app:cardCornerRadius="10dp"
+    app:contentPadding="8dp"
+    android:background="@drawable/bg"
     app:elevation="10dp"
     android:layout_marginTop="4dp"
     android:layout_marginBottom="4dp">
@@ -18,33 +18,37 @@
     <TextView
         android:id="@+id/person_id"
         android:layout_width="50dp"
-        android:layout_height="15dp"
-        android:textSize="15sp"
-        android:textColor="#FFFFFF"
-        android:fontFamily="@font/maplestorylight"/>
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
+        android:fontFamily="@font/maplestorylight"
+        android:textColor="#000000"
+        android:textSize="15sp" />
 
     <TextView
         android:id="@+id/person_name"
         android:layout_width="70dp"
-        android:layout_height="15dp"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:textSize="15sp"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:fontFamily="@font/maplestorylight"/>
 
     <TextView
         android:id="@+id/person_major"
         android:layout_width="70dp"
-        android:layout_height="15dp"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:textSize="15sp"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:fontFamily="@font/maplestorylight"/>
 
     <TextView
         android:id="@+id/person_enter_time"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        android:gravity="center_vertical"
         android:fontFamily="@font/maplestorylight"
-        android:textColor="#FFFFFF"
+        android:textColor="#000000"
         android:textSize="15sp" />
 
 </LinearLayout>
