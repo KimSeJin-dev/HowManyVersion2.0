@@ -2,7 +2,6 @@ package com.example.howmany;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,18 +10,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Random;
-
 import im.dacer.androidcharts.LineView;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -168,7 +161,7 @@ public class FragFirst extends Fragment {
 
         switch(final_date){
             case 1:
-                day_x = "일";
+                day_x = "";
                 break ;
             case 2:
                 day_x = "월";

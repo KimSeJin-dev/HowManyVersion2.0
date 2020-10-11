@@ -44,9 +44,9 @@ class StopWatch : AppCompatActivity() {
     private fun recordLapTime(){
         val lapTime = this.time
         val textView = TextView(this)
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,40F)
-        textView.setTextColor(Color.parseColor("#FF7200"))
-        textView.text = "$Lap LAB : ${lapTime / 100}" + "분 " + "${lapTime % 100}" + "초"
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,30F)
+        textView.setTextColor(Color.parseColor("#FFFFFF"))
+        textView.text = "$Lap 세트 : ${lapTime / 100}" + "분 " + "${lapTime % 100}" + "초"
          //맨 위에 랩타임 추가가
         lapLayout.addView(textView, 0)
         Lap++

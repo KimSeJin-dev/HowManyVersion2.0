@@ -1,6 +1,4 @@
 package com.example.howmany;
-
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
-
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -36,12 +33,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
+import at.grabner.circleprogress.CircleProgressView;
 import me.relex.circleindicator.CircleIndicator3;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+
+import android.widget.ImageView;
+import android.graphics.drawable.Drawable;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -61,7 +62,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private IntentIntegrator qrScan;
 
+    int[] images =  new int[] {R.drawable.health1, R.drawable.health2,
+    R.drawable.health3, R.drawable.health4, R.drawable.health45,R.drawable.health6,
+    R.drawable.health7, R.drawable.health8, R.drawable.health9};
+
     Fragment fragfirst;
+
+
+    CircleProgressView mCircleView; // livePercent
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +92,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPager.setCurrentItem(1000);
         mPager.setOffscreenPageLimit(3);
 
+
+
+        mCircleView = (CircleProgressView) findViewById(R.id.circleView);
+        mCircleView.setOnProgressChangedListener(new CircleProgressView.OnProgressChangedListener() {
+            @Override
+            public void onProgressChanged(float value) {
+                Log.d(TAG, "Progress Changed: " + value);
+            }
+        });
+
+        mCircleView.setMaxValue(100);
 
         mPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
@@ -156,14 +175,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         int num_1 = 1;
                         for (PostItem item : mList) {
 
+                            int imageId = (int)(Math.random() * images.length);
                             PeopleList peopleList = new PeopleList();
-                            peopleList.setId(num_1 + "번");
+
+                            peopleList.setId(images[imageId]);
                             peopleList.setName(item.getName());
                             peopleList.setMajor(item.getMajor());
                             Log.d(TAG, "Test_ex" + item.getEnter_time());
-                            peopleList.setEnter_time(item.getEnter_time().substring(0,4) + "년" +
-                                    item.getEnter_time().substring(5,7) + "월 " +
-                                    item.getEnter_time().substring(8,10) + "일 " +
+                            peopleList.setEnter_time(
                                     item.getEnter_time().substring(11,13) + "시 " +
                                     item.getEnter_time().substring(14,16) + "분 " ); //2020-09-29T13:18:33
                             arrayList.add(peopleList);
@@ -197,15 +216,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 int num = 1;
                                 for (PostItem item : mList) {
 
-
+                                    int imageId = (int)(Math.random() * images.length);
                                     PeopleList peopleList = new PeopleList();
-                                    peopleList.setId(num + "번");
+
+                                    peopleList.setId(images[imageId]);
                                     peopleList.setName(item.getName());
                                     peopleList.setMajor(item.getMajor());
 
-                                    peopleList.setEnter_time(item.getEnter_time().substring(0,4) + "년" +
-                                            item.getEnter_time().substring(5,7) + "월 " +
-                                            item.getEnter_time().substring(8,10) + "일 " +
+                                    peopleList.setEnter_time(
                                             item.getEnter_time().substring(11,13) + "시 " +
                                             item.getEnter_time().substring(14,16) + "분 "); //2020-09-29T13:18:33
 
@@ -214,6 +232,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
 
                                 customAdapter.notifyDataSetChanged();
+                                mCircleView.setValue(mList.size());
 
                             } else {
                                 Log.d(TAG, "Status Code : " + response.code());
@@ -230,11 +249,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     transaction.detach(fragfirst).attach(fragfirst).commit();
 
                     swipeRefreshLayout.setRefreshing(false);
+
+
                 }
             });
 
 
-        buttonScan = (Button) findViewById(R.id.buttonScan);
+        buttonScan = (Button) findViewById(R.id.buttonScan_In);
         buttonScan.setOnClickListener(this);
 
 
@@ -304,11 +325,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent_1);
             */
             if (result.getContents() == null) {
-                Log.d(TAG,"테스트0");
-                String address = "http://emoclew.pythonanywhere.com/"; //obj.getString("address");// 주소 받아오기
-                Intent intent_1 = new Intent(MainActivity.this, pWebView.class);
-                intent_1.putExtra("webview_addr",address);
-                startActivity(intent_1);
+//                Log.d(TAG,"테스트0");
+//                String address = "http://emoclew.pythonanywhere.com/"; //obj.getString("address");// 주소 받아오기
+//                Intent intent_1 = new Intent(MainActivity.this, pWebView.class);
+//                intent_1.putExtra("webview_addr",address);
+//                startActivity(intent_1);
                 Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
 
             } else {
@@ -336,7 +357,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> { // 리사이클러뷰
+    public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+        int imageId = (int)(Math.random() * images.length);// 리사이클러뷰
 
 
         @NonNull
@@ -348,7 +371,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, final int position) {
-            ((CustomViewHolder) holder).person_id.setText(arrayList.get(position).getId());
+
+            ((CustomViewHolder) holder).person_id.setImageResource(arrayList.get(position).getId());//Drawable(arrayList.get(position).getId());
             ((CustomViewHolder) holder).person_name.setText(arrayList.get(position).getName());
             ((CustomViewHolder) holder).person_major.setText(arrayList.get(position).getMajor());
             ((CustomViewHolder) holder).person_enter_time.setText(arrayList.get(position).getEnter_time());
@@ -363,14 +387,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         private class CustomViewHolder extends RecyclerView.ViewHolder {
-            TextView person_id;
+            ImageView person_id;
             TextView person_name;
             TextView person_major;
             TextView person_enter_time;
 
             public CustomViewHolder(View view) {
                 super(view);
-                person_id = (TextView) view.findViewById(R.id.person_id);
+                person_id = (ImageView) view.findViewById(R.id.person_id);
                 person_name = (TextView) view.findViewById(R.id.person_name);
                 person_major = (TextView) view.findViewById(R.id.person_major);
                 person_enter_time = (TextView) view.findViewById(R.id.person_enter_time);
