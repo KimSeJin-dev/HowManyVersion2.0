@@ -44,7 +44,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import android.widget.ImageView;
 import android.graphics.drawable.Drawable;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity {
 
     private final String TAG = getClass().getSimpleName();
     ArrayList<PeopleList> arrayList = new ArrayList<>();
@@ -155,6 +155,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
 
 
+        qrScan = new IntentIntegrator(this);
+        buttonScan = (Button) findViewById(R.id.buttonScan_In);
+        buttonScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                qrScan.setPrompt("Scanning...");
+                qrScan.setOrientationLocked(false);
+                qrScan.initiateScan();
+
+            }
+        });
+//        buttonScan.setOnClickListener(new Butxton.onCli);
+//        @Override
+//        public void onClick(View view) {
+//            if( view == buttonScan) { //qr코드 버튼 클릭시
+//                //scan option
+//
+//            }
+//
+//            else if( view == mStopWatch){
+//
+//            }
+//        }
+
+
         initMyAPI(BASE_URL);
 
 
@@ -254,9 +280,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             });
 
-
-        buttonScan = (Button) findViewById(R.id.buttonScan_In);
-        buttonScan.setOnClickListener(this);
+//
+//        buttonScan.setOnClickListener(this);
 
 
     }
@@ -295,20 +320,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    @Override
-    public void onClick(View v) {
-        if( v == buttonScan) { //qr코드 버튼 클릭시
-            //scan option
-            qrScan = new IntentIntegrator(this);
-            qrScan.setPrompt("Scanning...");
-            qrScan.setOrientationLocked(false);
-            qrScan.initiateScan();
-        }
 
-        else if( v == mStopWatch){
-
-        }
-    }
 
 
     //Getting the scan results
@@ -335,18 +347,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 //qrcode 결과가 있으면
                 Toast.makeText(MainActivity.this, "Scan Perfect", Toast.LENGTH_SHORT).show();
-                try {
-                    //data를 json으로 변환
-                     JSONObject obj = new JSONObject(result.getContents());
-                    String address_1 = "m.naver.com"; //obj.getString("address");// 주소 받아오기
-                    Intent intent = new Intent(MainActivity.this, pWebView.class);
-                    intent.putExtra("webview_addr",address_1);
+                //data를 json으로 변환
+                String address_1 = result.getContents();// 주소 받아오기
+                Intent intent = new Intent(MainActivity.this, pWebView.class);
+                intent.putExtra("webview_addr",address_1);
+                startActivity(intent);
 
-                    startActivity(intent);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    //Toast.makeText(MainActivity.this, result.getContents(), Toast.LENGTH_LONG).show();
-                }
             }
 
         } else {
