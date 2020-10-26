@@ -1,25 +1,18 @@
 package com.example.howmany;
 
-import android.app.AppComponentFactory;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Button;
-
 import static com.example.howmany.R.id.webView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 public class pWebView extends AppCompatActivity {
     private static final String TAG = "MyTAG";
-
     private WebView mWebView;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,18 +35,6 @@ public class pWebView extends AppCompatActivity {
         mWebView.setWebViewClient(new WebViewClientClass());//새창열기 없이 웹뷰 내에서 다시 열기//페이지 이동 원활히 하기위해 사용
 
     }
-
-
-   /* @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {//뒤로가기 버튼 이벤트
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && mWebView.canGoBack()) {//웹뷰에서 뒤로가기 버튼을 누르면 뒤로가짐
-            mWebView.goBack();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-    */
-
 
     @Override
     public void onBackPressed() {

@@ -7,34 +7,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.ViewCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
-
 import at.grabner.circleprogress.CircleProgressView;
-import me.relex.circleindicator.CircleIndicator3;
+import im.dacer.androidcharts.BarView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,23 +35,16 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import android.widget.ImageView;
-import android.graphics.drawable.Drawable;
+
 
 public class MainActivity extends AppCompatActivity {
 
+    int Mon, Tue, Wed, Thu, Fri, Sat, Sun = 0;
     private final String TAG = getClass().getSimpleName();
     ArrayList<PeopleList> arrayList = new ArrayList<>();
     private final String BASE_URL = "http://emoclew.pythonanywhere.com";
     private MyAPI mMyAPI;
     public static WebView mWebView;
-    private Button buttonScan;
-    private Button mStopWatch;
-
-
-    private ViewPager2 mPager;
-    private FragmentStateAdapter pagerAdapter;
-    private int num_page = 2;
-    private CircleIndicator3 mIndicator;
 
     private IntentIntegrator qrScan;
 
@@ -75,24 +61,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        fragfirst = new FragFirst();
-
-        //ViewPager2
-        mPager = findViewById(R.id.viewpager);
-        //Adapter
-        pagerAdapter = new MyAdapter(this, num_page);
-        mPager.setAdapter(pagerAdapter);
-        //Indicator
-        mIndicator = findViewById(R.id.indicator);
-        mIndicator.setViewPager(mPager);
-        mIndicator.createIndicators(num_page,0);
-        //ViewPager Setting
-        mPager.setOrientation(ViewPager2.ORIENTATION_HORIZONTAL);
-        mPager.setCurrentItem(1000);
-        mPager.setOffscreenPageLimit(3);
-
-
+//
+//        fragfirst = new FragFirst();
 
         mCircleView = (CircleProgressView) findViewById(R.id.circleView);
         mCircleView.setOnProgressChangedListener(new CircleProgressView.OnProgressChangedListener() {
@@ -103,47 +73,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
         mCircleView.setMaxValue(100);
-
-        mPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                super.onPageScrolled(position, positionOffset, positionOffsetPixels);
-                if (positionOffsetPixels == 0) {
-                    mPager.setCurrentItem(position);
-                }
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected(position);
-                mIndicator.animatePageSelected(position%num_page);
-            }
-
-        });
-
-        final float pageMargin= getResources().getDimensionPixelOffset(R.dimen.pageMargin);
-        final float pageOffset = getResources().getDimensionPixelOffset(R.dimen.offset);
-
-        mPager.setPageTransformer(new ViewPager2.PageTransformer() {
-            @Override
-            public void transformPage(@NonNull View page, float position) {
-                float myOffset = position * -(2 * pageOffset + pageMargin);
-                if (mPager.getOrientation() == ViewPager2.ORIENTATION_HORIZONTAL) {
-                    if (ViewCompat.getLayoutDirection(mPager) == ViewCompat.LAYOUT_DIRECTION_RTL) {
-                        page.setTranslationX(-myOffset);
-                    } else {
-                        page.setTranslationX(myOffset);
-                    }
-                } else {
-                    page.setTranslationY(myOffset);
-                }
-            }
-        });
-
-
         mWebView = findViewById(R.id.webView);
 
-        mStopWatch = findViewById(R.id.stopwatch);
+        final BarView barView = (BarView) findViewById(R.id.line_view_float);
+
+        initMyAPI(BASE_URL);
+        initLineView(barView);
+        randomSet(barView);
+        Button mStopWatch = findViewById(R.id.stopwatch);
         mStopWatch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,34 +92,32 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
         qrScan = new IntentIntegrator(this);
-        buttonScan = (Button) findViewById(R.id.buttonScan_In);
-        buttonScan.setOnClickListener(new View.OnClickListener() {
+        Button buttonScan_In = (Button) findViewById(R.id.buttonScan_In);
+        buttonScan_In.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                qrScan.setPrompt("Scanning...");
-                qrScan.setOrientationLocked(false);
                 qrScan.initiateScan();
+                qrScan.setOrientationLocked(false);
+                qrScan.setPrompt("스캐너에 QR코드를 위치시켜주세요");
+
 
             }
         });
-//        buttonScan.setOnClickListener(new Butxton.onCli);
-//        @Override
-//        public void onClick(View view) {
-//            if( view == buttonScan) { //qr코드 버튼 클릭시
-//                //scan option
-//
-//            }
-//
-//            else if( view == mStopWatch){
-//
-//            }
-//        }
 
+        Button buttonScan_Out = (Button) findViewById(R.id.buttonScan_Out);
+        buttonScan_Out.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                qrScan.initiateScan();
+                qrScan.setOrientationLocked(false);
+                qrScan.setPrompt("스캐너에 QR코드를 위치시켜주세요");
+
+            }
+        });
 
         initMyAPI(BASE_URL);
-
 
         RecyclerView recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -198,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
                         List<PostItem> mList = response.body();
                         arrayList.clear();
-                        int num_1 = 1;
+
                         for (PostItem item : mList) {
 
                             int imageId = (int)(Math.random() * images.length);
@@ -212,10 +147,11 @@ public class MainActivity extends AppCompatActivity {
                                     item.getEnter_time().substring(11,13) + "시 " +
                                     item.getEnter_time().substring(14,16) + "분 " ); //2020-09-29T13:18:33
                             arrayList.add(peopleList);
-                            num_1++;
+
 
                         }
                           customAdapter.notifyDataSetChanged();
+                          mCircleView.setValue(mList.size());
                         } else {
                         Log.d(TAG, "Status Code : " + response.code());
                     }
@@ -231,7 +167,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onRefresh() {
 
-
                     Call<List<PostItem>> getCall = mMyAPI.get_posts();
                     getCall.enqueue(new Callback<List<PostItem>>() {
                         @Override
@@ -239,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
                             if (response.isSuccessful()) {
                                 List<PostItem> mList = response.body();
                                 arrayList.clear();
-                                int num = 1;
+
                                 for (PostItem item : mList) {
 
                                     int imageId = (int)(Math.random() * images.length);
@@ -254,10 +189,13 @@ public class MainActivity extends AppCompatActivity {
                                             item.getEnter_time().substring(14,16) + "분 "); //2020-09-29T13:18:33
 
                                     arrayList.add(peopleList);
-                                    num++;
+
                             }
 
                                 customAdapter.notifyDataSetChanged();
+                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+                                transaction.detach(fragfirst).attach(fragfirst).commit();
+
                                 mCircleView.setValue(mList.size());
 
                             } else {
@@ -271,18 +209,159 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
 
-                    FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                    transaction.detach(fragfirst).attach(fragfirst).commit();
-
                     swipeRefreshLayout.setRefreshing(false);
-
 
                 }
             });
 
-//
-//        buttonScan.setOnClickListener(this);
 
+    }
+
+
+    private void initLineView(BarView barView) {
+        ArrayList<String> test = new ArrayList<String>();
+
+        test.add("월");
+        test.add("화");
+        test.add("수");
+        test.add("목");
+        test.add("금");
+        test.add("토");
+        test.add("일");
+
+        barView.setBottomTextList(test);
+
+
+    }
+
+
+    private void randomSet(final BarView barViewFloat) {
+
+        Call<List<PostItem>> getCall = mMyAPI.get_posts();
+        getCall.enqueue(new Callback<List<PostItem>>() {
+            @Override
+            public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
+                if (response.isSuccessful()) {
+                    List<PostItem> mList = response.body();
+
+                    for (PostItem item : mList) {
+                        String day = item.getEnter_time().substring(0,10);
+                        String Date  = getDateDay(day);
+                        Log.d(TAG, "example : " + Date);
+                        if(Date == "월"){ Mon++; }
+                        else if(Date == "화"){ Tue++; }
+                        else if(Date == "수"){ Wed++; }
+                        else if(Date == "목"){ Thu++; }
+                        else if(Date == "금"){ Fri++; }
+                        else if(Date == "토"){ Sat++; }
+                        else if(Date == "일"){ Sun++; }
+                        Log.d(TAG, "example2 : " + Fri);
+                    }
+
+                    TextView textView_mon = (TextView) findViewById(R.id.live_mon);
+                    TextView textView_tue = (TextView) findViewById(R.id.live_tue);
+                    TextView textView_wed = (TextView) findViewById(R.id.live_wen);
+                    TextView textView_thur = (TextView) findViewById(R.id.live_thur);
+                    TextView textView_fri = (TextView) findViewById(R.id.live_fri);
+                    TextView textView_sat = (TextView) findViewById(R.id.live_sat);
+                    TextView textView_sun = (TextView) findViewById(R.id.live_sun);
+
+                    textView_mon.setText("월 : "+Mon + "명");
+                    textView_tue.setText("화 : " + Tue + "명");
+                    textView_wed.setText("수 : " + Wed +"명");
+                    textView_thur.setText("목 : " + Thu + "명");
+                    textView_fri.setText("금 : " + Fri + "명");
+                    textView_sat.setText(" : " + Sat +"명");
+                    textView_sun.setText("일 : " + Sun + "명");
+
+
+
+                    ArrayList<Integer> dataListF = new ArrayList<>();
+                    dataListF.add(Mon);
+                    dataListF.add(Tue);
+                    dataListF.add(Wed);
+                    dataListF.add(Thu);
+                    dataListF.add(Fri);
+                    dataListF.add(Sat);
+                    dataListF.add(Sun);
+
+                    barViewFloat.setDataList(dataListF,100);
+                    Mon = 0;
+                    Tue = 0;
+                    Wed = 0;
+                    Thu = 0;
+                    Fri = 0;
+                    Sat = 0;
+                    Sun = 0;
+
+                } else {
+                    Log.d(TAG, "Status Code : " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<PostItem>> call, Throwable t) {
+
+            }
+        });
+
+
+
+
+    }
+
+
+
+
+
+
+
+    private String getDateDay(String day){
+        String day_x ="";
+
+        String day_num[] = day.split("-");
+        String day_final = day_num[0] + day_num[1] + day_num[2];
+
+        java.util.Date wantDate = null;
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyyMMdd");
+
+        try {
+            wantDate = sdf.parse(day_final);
+        }
+        catch (ParseException ex)
+        {
+            ex.printStackTrace();
+        }
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(wantDate);
+        int final_date = calendar.get(Calendar.DAY_OF_WEEK);
+
+        switch(final_date){
+            case 1:
+                day_x = "";
+                break ;
+            case 2:
+                day_x = "월";
+                break ;
+            case 3:
+                day_x = "화";
+                break ;
+            case 4:
+                day_x = "수";
+                break ;
+            case 5:
+                day_x = "목";
+                break ;
+            case 6:
+                day_x = "금";
+                break ;
+            case 7:
+                day_x = "토";
+                break ;
+        }
+
+        return day_x;
 
     }
 
@@ -297,32 +376,6 @@ public class MainActivity extends AppCompatActivity {
 
         mMyAPI = retrofit.create(MyAPI.class);
     }
-
-        	public static String utcToLocaltime(String datetime) throws Exception {
-        	    String locTime = null;
-        	    //TimeZone tz = TimeZone.getTimeZone("GMT+08:00"); 해당 국가 일시 확인 할 때, 한쿸은 +9
-        	    TimeZone tz = TimeZone.getDefault();
-        	        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-        	    try {
-        	        Date parseDate = sdf.parse(datetime);
-        	        long milliseconds = parseDate.getTime();
-        	        int offset = tz.getOffset(milliseconds);
-        	        locTime = sdf.format(milliseconds + offset);
-        	        locTime = locTime.replace("+0000", "");
-        	    } catch(Exception e) {
-        	        e.printStackTrace();
-        	              }
-
-        	    return locTime;
-        	}
-
-
-
-
-
-
-
     //Getting the scan results
     //qr코드 승인 , qr코드 없을시
     @Override
@@ -330,18 +383,7 @@ public class MainActivity extends AppCompatActivity {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
 
-           //qrcode 가 없으면
-           /*String address = "www.naver.com"; //obj.getString("address");// 주소 받아오기
-            Intent intent_1 = new Intent(MainActivity.this, pWebView.class);
-            intent_1.putExtra("webview_addr",address);
-            startActivity(intent_1);
-            */
             if (result.getContents() == null) {
-//                Log.d(TAG,"테스트0");
-//                String address = "http://emoclew.pythonanywhere.com/"; //obj.getString("address");// 주소 받아오기
-//                Intent intent_1 = new Intent(MainActivity.this, pWebView.class);
-//                intent_1.putExtra("webview_addr",address);
-//                startActivity(intent_1);
                 Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
 
             } else {
@@ -360,12 +402,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-
-
     public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-
-        int imageId = (int)(Math.random() * images.length);// 리사이클러뷰
 
 
         @NonNull
@@ -382,8 +419,6 @@ public class MainActivity extends AppCompatActivity {
             ((CustomViewHolder) holder).person_name.setText(arrayList.get(position).getName());
             ((CustomViewHolder) holder).person_major.setText(arrayList.get(position).getMajor());
             ((CustomViewHolder) holder).person_enter_time.setText(arrayList.get(position).getEnter_time());
-
-
 
         }
 

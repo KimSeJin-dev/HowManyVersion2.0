@@ -14,6 +14,7 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.graphics.drawable.NinePatchDrawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import java.util.ArrayList;
@@ -141,23 +142,29 @@ public class LineView extends View {
             bottomTextPaint.getTextBounds(s, 0, s.length(), r);
             if (bottomTextHeight < r.height()) {
                 bottomTextHeight = r.height();
+
             }
             if (autoSetGridWidth && (longestWidth < r.width())) {
                 longestWidth = r.width();
                 longestStr = s;
+
             }
             if (bottomTextDescent < (Math.abs(r.bottom))) {
                 bottomTextDescent = Math.abs(r.bottom);
+
             }
+
         }
 
         if (autoSetGridWidth) {
             if (backgroundGridWidth < longestWidth) {
                 backgroundGridWidth =
-                        longestWidth + (int) bottomTextPaint.measureText(longestStr, 0, 1);
+                      5+   longestWidth + (int) bottomTextPaint.measureText(longestStr, 0, 1);
+
             }
             if (sideLineLength < longestWidth / 2) {
                 sideLineLength = longestWidth / 2;
+
             }
         }
 
@@ -438,13 +445,16 @@ public class LineView extends View {
                 dottedPath.moveTo(0, yCoordinateList.get(i));
                 dottedPath.lineTo(getWidth(), yCoordinateList.get(i));
                 canvas.drawPath(dottedPath, paint);
+
             }
         }
         //draw bottom text
         if (bottomTextList != null) {
             for (int i = 0; i < bottomTextList.size(); i++) {
-                canvas.drawText(bottomTextList.get(i), sideLineLength + backgroundGridWidth * i,
+                canvas.drawText(bottomTextList.get(i), (sideLineLength) + backgroundGridWidth * i,
                         mViewHeight - bottomTextDescent, bottomTextPaint);
+
+
             }
         }
 
@@ -521,6 +531,7 @@ public class LineView extends View {
             for (Dot dot : data) {
                 final int pointX = dot.x;
                 final int pointY = (int) dot.y;
+
 
                 r.set(pointX - width, pointY - width, pointX + width, pointY + width);
                 if (r.contains(x, y)) {
