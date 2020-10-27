@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@drawable/button_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginBottom="12dp"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:textSize="40dp"
+        android:text="최초 로그인시 한번만 실행됩니다." />
+
+    <TextView
+        android:id="@+id/textViewEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:text="이메일" />
+
+    <EditText
+        android:id="@+id/editTextEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_marginBottom="12dp"
+        android:hint="eMail Address"
+        android:inputType="textPersonName" />
+
+    <TextView
+        android:id="@+id/textViewPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:text="비밀번호" />
+
+    <EditText
+        android:id="@+id/editTextPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_marginBottom="12dp"
+        android:hint="Password"
+        android:inputType="textPassword" />
+
+<!--    <Button-->
+<!--        android:id="@+id/buttonLogin"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="right"-->
+<!--        android:onClick="onLoginButtonClicked"-->
+<!--        android:text="로그인" />-->
+
+</LinearLayout>
