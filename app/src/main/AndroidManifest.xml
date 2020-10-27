@@ -26,6 +26,7 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
+        <activity android:name=".FirstInput"/>
         <activity android:name=".StopWatch" />
         <activity android:name=".MainActivity">
         </activity>

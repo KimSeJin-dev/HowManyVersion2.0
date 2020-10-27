@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 public class FirstInput extends AppCompatActivity {
@@ -26,8 +25,8 @@ public class FirstInput extends AppCompatActivity {
         LayoutInflater inflater = getLayoutInflater();
         final View v = inflater.inflate(R.layout.login_dialog, null);
 
-        editTextEmail = (EditText) v.findViewById(R.id.editTextEmail);
-        editTextPassword = (EditText) v.findViewById(R.id.editTextPassword);
+        editTextEmail = v.findViewById(R.id.editTextEmail);
+        editTextPassword = v.findViewById(R.id.editTextPassword);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(v);
@@ -40,13 +39,10 @@ public class FirstInput extends AppCompatActivity {
 
                 Intent intent = new Intent(FirstInput.this, MainActivity.class);
                 startActivity(intent);
-//                Toast.makeText(this, "Email : "+email+"\nPassword : "+password, Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
             }
         });
         builder.show();
-//        dialog = builder.create();
-//        dialog.show();
-    }
+   }
 
 }

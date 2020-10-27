@@ -1,5 +1,6 @@
 package com.example.howmany;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -39,6 +40,9 @@ import android.widget.ImageView;
 
 public class MainActivity extends AppCompatActivity {
 
+    public SharedPreferences prefs;
+
+
     int Mon, Tue, Wed, Thu, Fri, Sat, Sun = 0;
     private final String TAG = getClass().getSimpleName();
     ArrayList<PeopleList> arrayList = new ArrayList<>();
@@ -64,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
 //
 //        fragfirst = new FragFirst();
 
+        prefs = getSharedPreferences("Pref", MODE_PRIVATE);
+        checkFirstRun();
         mCircleView = (CircleProgressView) findViewById(R.id.circleView);
         mCircleView.setOnProgressChangedListener(new CircleProgressView.OnProgressChangedListener() {
             @Override
@@ -193,8 +199,6 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                                 customAdapter.notifyDataSetChanged();
-                                FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-                                transaction.detach(fragfirst).attach(fragfirst).commit();
 
                                 mCircleView.setValue(mList.size());
 
@@ -218,6 +222,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
     private void initLineView(BarView barView) {
         ArrayList<String> test = new ArrayList<String>();
 
@@ -231,6 +237,18 @@ public class MainActivity extends AppCompatActivity {
 
         barView.setBottomTextList(test);
 
+
+    }
+
+
+    public void checkFirstRun() {
+        boolean isFirstRun = prefs.getBoolean("isFirstRun", true);
+        if (isFirstRun) {
+            Intent newIntent = new Intent(MainActivity.this, FirstInput.class);
+            startActivity(newIntent);
+
+            prefs.edit().putBoolean("isFirstRun", false).apply();
+        }
 
     }
 
