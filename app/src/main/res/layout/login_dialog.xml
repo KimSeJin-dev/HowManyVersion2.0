@@ -14,41 +14,58 @@
         android:layout_marginBottom="12dp"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:textSize="40dp"
-        android:text="최초 로그인시 한번만 실행됩니다." />
+        android:textSize="20dp"
+        android:text="어플 설치시 최초 1행만 실행됩니다." />
 
     <TextView
-        android:id="@+id/textViewEmail"
+        android:id="@+id/textViewName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:text="이메일" />
+        android:text="이름" />
 
     <EditText
-        android:id="@+id/editTextEmail"
+        android:id="@+id/editTextName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:layout_marginBottom="12dp"
-        android:hint="eMail Address"
+        android:hint="name"
         android:inputType="textPersonName" />
 
     <TextView
-        android:id="@+id/textViewPassword"
+        android:id="@+id/textViewMajor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:text="비밀번호" />
+        android:text="학과" />
 
     <EditText
-        android:id="@+id/editTextPassword"
+        android:id="@+id/editTextMajor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:ems="10"
         android:layout_marginBottom="12dp"
-        android:hint="Password"
+        android:hint="major"
+        android:inputType="textPassword" />
+
+    <TextView
+        android:id="@+id/textViewPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:text="핸드폰 번호" />
+
+    <EditText
+        android:id="@+id/editTextPhone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:layout_marginBottom="12dp"
+        android:hint="010-1234-5678"
         android:inputType="textPassword" />
 
 <!--    <Button-->

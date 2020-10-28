@@ -1,6 +1,8 @@
 package com.example.howmany;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -8,14 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -41,6 +41,11 @@ import android.widget.ImageView;
 public class MainActivity extends AppCompatActivity {
 
     public SharedPreferences prefs;
+
+
+    SQLiteDatabase db;
+    String Information_real = "Information";
+    Cursor cursor = null;
 
 
     int Mon, Tue, Wed, Thu, Fri, Sat, Sun = 0;
@@ -119,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 qrScan.initiateScan();
                 qrScan.setOrientationLocked(false);
                 qrScan.setPrompt("스캐너에 QR코드를 위치시켜주세요");
+                findID();
 
             }
         });
@@ -222,6 +228,83 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    static class Information {
+        String name;
+        String major;
+        String phone;
+    }
+
+
+    private void findID(){
+
+        Call<List<PostItem>> getCall = mMyAPI.get_posts();
+        getCall.enqueue(new Callback<List<PostItem>>() {
+            @Override
+            public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
+                if (response.isSuccessful()) {
+
+                    Information inform = findQuery();
+                    List<PostItem> mList = response.body();
+
+                    findQuery();
+
+
+                    for (PostItem item : mList) {
+
+                        if(item.getName() == inform.name && item.getMajor() == inform.major && item.getPhone_num() == inform.phone  )
+                        {
+                            Log.d("TAG", "bigtest : success");
+
+                        }
+
+
+
+                    }
+                } else {
+                    Log.d(TAG, "Status Code : " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<PostItem>> call, Throwable t) {
+
+            }
+        });
+    }
+
+   Information findQuery(){
+
+
+
+        Information infor = new Information();
+        try {
+            cursor = db.query(Information_real, null, null, null, null, null, null);
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    String name = cursor.getString(cursor.getColumnIndex("NAME"));
+                    String major = cursor.getString(cursor.getColumnIndex("MAJOR"));
+                    String phone = cursor.getString(cursor.getColumnIndex("PHONE"));
+
+                    infor.name = name;
+                    infor.major = major;
+                    infor.phone = phone;
+
+                    Log.d(TAG, "id: " + name + ", major: " + major + ", phone: " + phone);
+
+                }
+
+
+            }
+
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+       return infor;
+   }
+
+
 
 
     private void initLineView(BarView barView) {
@@ -289,10 +372,8 @@ public class MainActivity extends AppCompatActivity {
                     textView_wed.setText("수 : " + Wed +"명");
                     textView_thur.setText("목 : " + Thu + "명");
                     textView_fri.setText("금 : " + Fri + "명");
-                    textView_sat.setText(" : " + Sat +"명");
+                    textView_sat.setText("토 : " + Sat +"명");
                     textView_sun.setText("일 : " + Sun + "명");
-
-
 
                     ArrayList<Integer> dataListF = new ArrayList<>();
                     dataListF.add(Mon);
