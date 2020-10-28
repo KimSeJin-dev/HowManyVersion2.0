@@ -15,49 +15,15 @@
         android:textStyle="bold"
         android:textColor="#FFFFFF"
         android:textSize="20dp"
-        android:text="어플 설치시 최초 1행만 실행됩니다." />
+        android:text="어플 설치시 최초 1회만 실행됩니다." />
 
-    <TextView
-        android:id="@+id/textViewName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:text="이름" />
-
-    <EditText
-        android:id="@+id/editTextName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:layout_marginBottom="12dp"
-        android:hint="name"
-        android:inputType="textPersonName" />
-
-    <TextView
-        android:id="@+id/textViewMajor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:text="학과" />
-
-    <EditText
-        android:id="@+id/editTextMajor"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:ems="10"
-        android:layout_marginBottom="12dp"
-        android:hint="major"
-        android:inputType="textPassword" />
-
-    <TextView
+<TextView
         android:id="@+id/textViewPhone"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:textColor="#FFFFFF"
-        android:text="핸드폰 번호" />
+        android:text="전화 번호" />
 
     <EditText
         android:id="@+id/editTextPhone"
@@ -65,15 +31,72 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:layout_marginBottom="12dp"
-        android:hint="010-1234-5678"
-        android:inputType="textPassword" />
+        android:hint="01012345678"
+        android:inputType="number" />
 
-<!--    <Button-->
-<!--        android:id="@+id/buttonLogin"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="right"-->
-<!--        android:onClick="onLoginButtonClicked"-->
-<!--        android:text="로그인" />-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="25sp"
+        android:textColor="#FFFFFF"
+        android:text="기능"    />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:text="1. 운동 STOPWATCH를 통해 운동시간을 측정하세요!"    />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:text="2. 아이파크에서 입장QR코드와 퇴장QR코드를 통해 편하게 입장하세요!"    />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:text="3. 일주일마다 그래프는 초기화되며 운동이용률을 알수 있습니다."    />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:text=""    />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="25sp"
+        android:textColor="#FFFFFF"
+        android:text="주의사항"    />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:text="1. 최초 입력된 전화번호와 설문지의 전화번호가 일치해야 정확합니다."  />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:text="2. 새로고침을 하면 인원이 최신화됩니다."    />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:text="3. 그래프는 어플을 껐다 키면 최신화됩니다."    />
+
 
 </LinearLayout>

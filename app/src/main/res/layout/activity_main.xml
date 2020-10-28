@@ -94,7 +94,7 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="210dp"
+            android:layout_height="220sp"
             android:layout_marginTop="0dp">
 
                 <view
@@ -113,6 +113,7 @@
                     android:layout_toRightOf="@+id/line_view_float"
                     android:background="@drawable/button_background"
                     android:text="Test"
+                    android:textStyle="bold"
                     android:gravity="center"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
@@ -125,6 +126,7 @@
                     android:layout_toRightOf="@+id/line_view_float"
                     android:background="@drawable/button_background"
                     android:gravity="center"
+                    android:textStyle="bold"
                     android:text="월 : 20명"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
@@ -139,6 +141,7 @@
                     android:background="@drawable/button_background"
                     android:gravity="center"
                     android:text="월 : 20명"
+                    android:textStyle="bold"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
 
@@ -152,6 +155,7 @@
                     android:background="@drawable/button_background"
                     android:gravity="center"
                     android:text="월 : 20명"
+                    android:textStyle="bold"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
 
@@ -165,6 +169,7 @@
                     android:background="@drawable/button_background"
                     android:gravity="center"
                     android:text="월 : 20명"
+                    android:textStyle="bold"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
 
@@ -178,6 +183,7 @@
                     android:background="@drawable/button_background"
                     android:gravity="center"
                     android:text="월 : 20명"
+                    android:textStyle="bold"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
 
@@ -191,6 +197,7 @@
                     android:background="@drawable/button_background"
                     android:gravity="center"
                     android:text="월 : 20명"
+                    android:textStyle="bold"
                     android:textColor="#FFFFFF"
                     android:textSize="15sp" />
 

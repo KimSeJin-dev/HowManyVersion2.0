@@ -19,10 +19,13 @@ public interface MyAPI{
     Call<PostItem> patch_posts(@Path("pk") int pk, @Body PostItem post);
 
     @DELETE("/surveys/{pk}/")
-    Call<PostItem> delete_posts(@Path("pk") int pk);
+    Call<PostItem> delete_posts(@Path("pk") String pk);
 
     @GET("/surveys/")
     Call<List<PostItem>> get_posts();
+
+    @GET("/graph_Surveys/")
+    Call<List<PostItem>> get_graph_posts();
 
     @GET("/surveys/{pk}/")
     Call<PostItem> get_post_pk(@Path("pk") int pk);

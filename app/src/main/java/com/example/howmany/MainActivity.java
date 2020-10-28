@@ -16,17 +16,16 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
-
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import at.grabner.circleprogress.CircleProgressView;
 import im.dacer.androidcharts.BarView;
@@ -42,12 +41,8 @@ import android.widget.ImageView;
 public class MainActivity extends AppCompatActivity {
 
     public SharedPreferences prefs;
-
-
     SQLiteDatabase db;
-
-    Cursor cursor = null;
-
+    String tableName = "Information";
 
     int Mon, Tue, Wed, Thu, Fri, Sat, Sun = 0;
     private final String TAG = getClass().getSimpleName();
@@ -62,24 +57,34 @@ public class MainActivity extends AppCompatActivity {
     R.drawable.health3, R.drawable.health4, R.drawable.health45,R.drawable.health6,
     R.drawable.health7, R.drawable.health8, R.drawable.health9};
 
-    Fragment fragfirst;
-
-
     CircleProgressView mCircleView; // livePercent
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        DatabaseHelper databaseHelper = new DatabaseHelper(this, "DB", null, 1);
-        SQLiteDatabase db = databaseHelper.getWritableDatabase();
-
-
-
-//        fragfirst = new FragFirst();
+        Log.d("TAG","telepha0");
+        //initGraph();
 
         prefs = getSharedPreferences("Pref", MODE_PRIVATE);
+  //      boolean isFirstRun = prefs.getBoolean("isFirstRun", true);
         checkFirstRun();
+
+//        Log.d("TAG","telepha2");
+//
+//        if (isFirstRun) {
+//
+//            Log.d("TAG","telepha3");
+//            Intent intent = new Intent(this, PopupActivity.class);
+//            startActivity(intent);
+//
+//            Log.d("TAG","telepha4");
+//            prefs.edit().putBoolean("isFirstRun", false).apply();
+//
+//            Log.d("TAG","telepha5");
+//        }
+
+
         mCircleView = (CircleProgressView) findViewById(R.id.circleView);
         mCircleView.setOnProgressChangedListener(new CircleProgressView.OnProgressChangedListener() {
             @Override
@@ -130,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
                 qrScan.initiateScan();
                 qrScan.setOrientationLocked(false);
                 qrScan.setPrompt("스캐너에 QR코드를 위치시켜주세요");
-                findID();
+                deleteInformation();
 
             }
         });
@@ -213,6 +218,8 @@ public class MainActivity extends AppCompatActivity {
                                 customAdapter.notifyDataSetChanged();
 
                                 mCircleView.setValue(mList.size());
+                                Toast.makeText(MainActivity.this, "인원이 최신화되었습니다." , Toast.LENGTH_SHORT).show();
+
 
                             } else {
                                 Log.d(TAG, "Status Code : " + response.code());
@@ -233,71 +240,52 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void deleteInformation(){
 
-    static class Information {
-        String name;
-        String major;
-        String phone;
-    }
+        DatabaseHelper databaseHelper = new DatabaseHelper(MainActivity.this, "DB", null, 1);
+        // 쓰기 가능한 SQLiteDatabase 인스턴스 구함
+        db = databaseHelper.getWritableDatabase();
 
-
-    private void findID(){
-    User user = new User();
-        Call<List<PostItem>> getCall = mMyAPI.get_posts();
-        getCall.enqueue(new Callback<List<PostItem>>() {
-            @Override
-            public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
-                if (response.isSuccessful()) {
-
-                    String Information_real = "Information";
-                    List<PostItem> mList = response.body();
-
-                    DBSearch(Information_real);
-                    Log.d("TAG","tes123");
-                    Log.d("tag", "akak"+user.name + user.phone + user.major);
-//                    for (PostItem item : mList) {
-//
-//                        if(item.getName() == inform.name && item.getMajor() == inform.major && item.getPhone_num() == inform.phone  )
-//                        {
-//                            Log.d("TAG", "bigtest : success");
-//
-//                        }
-//
-//
-//
-//                    }
-                } else {
-                    Log.d(TAG, "Status Code : " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<PostItem>> call, Throwable t) {
-
-            }
-        });
-    }
-
-   void DBSearch(String tableName){
-       Cursor cursor = null;
-       User user = new User();
+        Cursor cursor = null;
 
         try {
             cursor = db.query(tableName, null, null, null, null, null, null);
             if (cursor != null) {
                 while (cursor.moveToNext()) {
-                    String name = cursor.getString(cursor.getColumnIndex("NAME"));
-                    String major = cursor.getString(cursor.getColumnIndex("MAJOR"));
                     String phone = cursor.getString(cursor.getColumnIndex("PHONE"));
 
-                    user.name = name;
-                    user.major = major;
-                    user.phone = phone;
-                    Log.d(TAG, "inforid: " + name + ", major: " + major + ", phone: " + phone);
+                    Call<PostItem> deleteCall = mMyAPI.delete_posts(phone);
 
+                    deleteCall.enqueue(new Callback<PostItem>() {
+                        @Override
+                        public void onResponse(Call<PostItem> call, Response<PostItem> response) {
+                            if (!response.isSuccessful()) {
+                                Toast.makeText(MainActivity.this, "실패했습니다. 에러메시지 : " + response.message(), Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+                            String content = "";
+                            content += "code: " + response.code()+"\n";
+                            content += "정상적으로 삭제되었습니다.";
+
+
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<PostItem> call, Throwable t) {
+
+                            Toast.makeText(MainActivity.this, "Cancelled :" + t.getMessage(), Toast.LENGTH_SHORT).show();
+
+                        }
+                    });
+
+
+
+
+
+
+                    Log.d("TAG",  "phone: " + phone);
                 }
-
-
             }
         } finally {
             if (cursor != null) {
@@ -305,8 +293,10 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-   }
+        db.close();
+        databaseHelper.close();
 
+    }
 
 
 
@@ -332,21 +322,16 @@ public class MainActivity extends AppCompatActivity {
         if (isFirstRun) {
             Intent newIntent = new Intent(MainActivity.this, FirstInput.class);
             startActivity(newIntent);
-
+            Log.d("TAG","telepha");
             prefs.edit().putBoolean("isFirstRun", false).apply();
         }
 
     }
 
-    public class User{
-        String name;
-        String major;
-        String phone;
-    }
 
     private void randomSet(final BarView barViewFloat) {
 
-        Call<List<PostItem>> getCall = mMyAPI.get_posts();
+        Call<List<PostItem>> getCall = mMyAPI.get_graph_posts();
         getCall.enqueue(new Callback<List<PostItem>>() {
             @Override
             public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
@@ -354,9 +339,8 @@ public class MainActivity extends AppCompatActivity {
                     List<PostItem> mList = response.body();
 
                     for (PostItem item : mList) {
-                        String day = item.getEnter_time().substring(0,10);
+                        String day = item.getExit_time().substring(0,10);
                         String Date  = getDateDay(day);
-                        Log.d(TAG, "example : " + Date);
                         if(Date == "월"){ Mon++; }
                         else if(Date == "화"){ Tue++; }
                         else if(Date == "수"){ Wed++; }
@@ -392,7 +376,7 @@ public class MainActivity extends AppCompatActivity {
                     dataListF.add(Sat);
                     dataListF.add(Sun);
 
-                    barViewFloat.setDataList(dataListF,100);
+                    barViewFloat.setDataList(dataListF,150);
                     Mon = 0;
                     Tue = 0;
                     Wed = 0;
@@ -411,11 +395,28 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-
-
-
-
     }
+
+//    private void initGraph(){
+//
+//        //오늘
+//        Date today = new Date();
+//        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+//        String toDay = date.format(today);
+//
+//        Log.d("TAG", "toDay : " + toDay);
+//
+//        //한주 전
+//        Calendar week = Calendar.getInstance();
+//        week.add(Calendar.DATE , -7);
+//        String beforeWeek = new java.text.SimpleDateFormat("yyyy-MM-dd").format(week.getTime());
+//
+//
+//
+//
+//
+//
+//    }
 
 
 

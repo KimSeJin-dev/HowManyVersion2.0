@@ -32,14 +32,14 @@ public class pWebView extends AppCompatActivity {
         mWebView.loadUrl(myUrl);//웹뷰 실행
         Log.d(myUrl,"테스트3");
         mWebView.setWebChromeClient(new WebChromeClient());//웹뷰에 크롬 사용 허용//이 부분이 없으면 크롬에서 alert가 뜨지 않음
-        mWebView.setWebViewClient(new WebViewClientClass());//새창열기 없이 웹뷰 내에서 다시 열기//페이지 이동 원활히 하기위해 사용
-
+        mWebView.setWebViewClient(new WebViewClientClass());//새창열기 없이 웹뷰 내에서 다시 열기//페이지 이동 원활히 하기위해 사
     }
 
     @Override
     public void onBackPressed() {
         if (mWebView.getUrl().equalsIgnoreCase(" http://emoclew.pythonanywhere.com")
                 || mWebView.getUrl().equalsIgnoreCase("http://emoclew.pythonanywhere.com/new/")
+                || mWebView.getUrl().equalsIgnoreCase("http://emoclew.pythonanywhere.com/new2/")
         ) {
             super.onBackPressed();
         }else if(mWebView.canGoBack()){
