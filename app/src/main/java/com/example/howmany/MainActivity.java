@@ -3,6 +3,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     SQLiteDatabase db;
-    String Information_real = "Information";
+
     Cursor cursor = null;
 
 
@@ -70,7 +71,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//
+        DatabaseHelper databaseHelper = new DatabaseHelper(this, "DB", null, 1);
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+
+
+
 //        fragfirst = new FragFirst();
 
         prefs = getSharedPreferences("Pref", MODE_PRIVATE);
@@ -82,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "Progress Changed: " + value);
             }
         });
+
 
         mCircleView.setMaxValue(100);
         mWebView = findViewById(R.id.webView);
@@ -236,30 +242,30 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void findID(){
-
+    User user = new User();
         Call<List<PostItem>> getCall = mMyAPI.get_posts();
         getCall.enqueue(new Callback<List<PostItem>>() {
             @Override
             public void onResponse(Call<List<PostItem>> call, Response<List<PostItem>> response) {
                 if (response.isSuccessful()) {
 
-                    Information inform = findQuery();
+                    String Information_real = "Information";
                     List<PostItem> mList = response.body();
 
-                    findQuery();
-
-
-                    for (PostItem item : mList) {
-
-                        if(item.getName() == inform.name && item.getMajor() == inform.major && item.getPhone_num() == inform.phone  )
-                        {
-                            Log.d("TAG", "bigtest : success");
-
-                        }
-
-
-
-                    }
+                    DBSearch(Information_real);
+                    Log.d("TAG","tes123");
+                    Log.d("tag", "akak"+user.name + user.phone + user.major);
+//                    for (PostItem item : mList) {
+//
+//                        if(item.getName() == inform.name && item.getMajor() == inform.major && item.getPhone_num() == inform.phone  )
+//                        {
+//                            Log.d("TAG", "bigtest : success");
+//
+//                        }
+//
+//
+//
+//                    }
                 } else {
                     Log.d(TAG, "Status Code : " + response.code());
                 }
@@ -272,36 +278,33 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-   Information findQuery(){
+   void DBSearch(String tableName){
+       Cursor cursor = null;
+       User user = new User();
 
-
-
-        Information infor = new Information();
         try {
-            cursor = db.query(Information_real, null, null, null, null, null, null);
+            cursor = db.query(tableName, null, null, null, null, null, null);
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     String name = cursor.getString(cursor.getColumnIndex("NAME"));
                     String major = cursor.getString(cursor.getColumnIndex("MAJOR"));
                     String phone = cursor.getString(cursor.getColumnIndex("PHONE"));
 
-                    infor.name = name;
-                    infor.major = major;
-                    infor.phone = phone;
-
-                    Log.d(TAG, "id: " + name + ", major: " + major + ", phone: " + phone);
+                    user.name = name;
+                    user.major = major;
+                    user.phone = phone;
+                    Log.d(TAG, "inforid: " + name + ", major: " + major + ", phone: " + phone);
 
                 }
 
 
             }
-
         } finally {
             if (cursor != null) {
                 cursor.close();
             }
         }
-       return infor;
+
    }
 
 
@@ -335,6 +338,11 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public class User{
+        String name;
+        String major;
+        String phone;
+    }
 
     private void randomSet(final BarView barViewFloat) {
 

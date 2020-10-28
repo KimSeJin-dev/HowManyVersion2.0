@@ -8,18 +8,16 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.database.sqlite.SQLiteDatabase;
-
-import com.google.firebase.database.FirebaseDatabase;
 
 public class FirstInput extends AppCompatActivity {
+
+    SQLiteDatabase db;
 
     private EditText editTextName;
     private EditText editTextMajor;
@@ -42,22 +40,26 @@ public class FirstInput extends AppCompatActivity {
         builder.setPositiveButton("입력", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                String tablename = "Information";
+
                 String name = editTextName.getText().toString();
                 String major = editTextMajor.getText().toString();
                 String phone = editTextPhone.getText().toString();
 
-                dbInsert("Information", name, major , phone);
-                Toast.makeText(FirstInput.this, "Name : "+ name +"\nMajor : " + major +"\nPhone : " + phone , Toast.LENGTH_SHORT).show();
-
 
                 DatabaseHelper databaseHelper = new DatabaseHelper(FirstInput.this, "DB", null, 1);
                 // 쓰기 가능한 SQLiteDatabase 인스턴스 구함
-                SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                db = databaseHelper.getWritableDatabase();
 
+                dbInsert(tablename, name, major , phone);
+
+                DBSearch(tablename);
                 db.close();
                 databaseHelper.close();
 
                 Intent intent = new Intent(FirstInput.this, MainActivity.class);
+                Toast.makeText(FirstInput.this, "Name : "+ name +"\nMajor : " + major +"\nPhone : " + phone , Toast.LENGTH_SHORT).show();
+
                 startActivity(intent);
                 dialog.dismiss();
             }
@@ -69,7 +71,7 @@ public class FirstInput extends AppCompatActivity {
 
 
 
-    void dbInsert(String tableName, String name, String major, String phone) {
+    void dbInsert(String tablename , String name, String major, String phone) {
         Log.d("TAG", "Insert Data " + name);
 
         ContentValues contentValues = new ContentValues();
@@ -79,7 +81,32 @@ public class FirstInput extends AppCompatActivity {
 
         Log.d("TAG","Table : " + contentValues);
 
+
+        db.insert(tablename, null, contentValues);
+
     }
 
+    void DBSearch(String tableName) {
+        Cursor cursor = null;
 
-}
+        try {
+            cursor = db.query(tableName, null, null, null, null, null, null);
+            if (cursor != null) {
+                while (cursor.moveToNext()) {
+                    String name = cursor.getString(cursor.getColumnIndex("NAME"));
+                    String major = cursor.getString(cursor.getColumnIndex("MAJOR"));
+                    String phone = cursor.getString(cursor.getColumnIndex("PHONE"));
+
+
+                    Log.d("TAG", "id: " + name + ", major: " + major + ", phone: " + phone);
+                }
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+
+    }
+
+    }
