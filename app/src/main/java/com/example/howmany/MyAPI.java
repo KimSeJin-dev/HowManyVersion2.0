@@ -8,6 +8,7 @@ import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface MyAPI{
@@ -20,6 +21,9 @@ public interface MyAPI{
 
     @DELETE("/surveys/{pk}/")
     Call<PostItem> delete_posts(@Path("pk") String pk);
+
+//    @PUT("/surveys/{pk}/")
+//    Call<Post> putPost(@Path("pk") String pk, @Body PutInformation putInformation);
 
     @GET("/surveys/")
     Call<List<PostItem>> get_posts();

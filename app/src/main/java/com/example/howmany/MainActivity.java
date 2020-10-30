@@ -240,16 +240,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
     private void deleteInformation(){
 
         DatabaseHelper databaseHelper = new DatabaseHelper(MainActivity.this, "DB", null, 1);
         // 쓰기 가능한 SQLiteDatabase 인스턴스 구함
         db = databaseHelper.getWritableDatabase();
 
-        Cursor cursor = null;
-
-        try {
-            cursor = db.query(tableName, null, null, null, null, null, null);
+        try (Cursor cursor = db.query(tableName, null, null, null, null, null, null)) {
             if (cursor != null) {
                 while (cursor.moveToNext()) {
                     String phone = cursor.getString(cursor.getColumnIndex("PHONE"));
@@ -264,11 +262,8 @@ public class MainActivity extends AppCompatActivity {
                                 return;
                             }
                             String content = "";
-                            content += "code: " + response.code()+"\n";
+                            content += "code: " + response.code() + "\n";
                             content += "정상적으로 삭제되었습니다.";
-
-
-
                         }
 
                         @Override
@@ -280,16 +275,8 @@ public class MainActivity extends AppCompatActivity {
                     });
 
 
-
-
-
-
-                    Log.d("TAG",  "phone: " + phone);
+                    Log.d("TAG", "phone: " + phone);
                 }
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
             }
         }
 
@@ -492,7 +479,11 @@ public class MainActivity extends AppCompatActivity {
         if (result != null) {
 
             if (result.getContents() == null) {
-                Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+                String address_1 = "http://emoclew.pythonanywhere.com";// 주소 받아오기
+                Intent intent = new Intent(MainActivity.this, pWebView.class);
+                intent.putExtra("webview_addr",address_1);
+                startActivity(intent);
+               // Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
 
             } else {
                 //qrcode 결과가 있으면

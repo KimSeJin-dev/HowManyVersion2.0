@@ -21,7 +21,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         Log.d(TAG, "Table Create");
         String createQuery = "CREATE TABLE " + TABLE_NAME +
                 "( ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "PHONE TEXT NOT NULL );";
+                "NAME TEXT , " +
+                "MAJOR TEXT, " +
+                "PHONE INTEGER );";
 
         sqLiteDatabase.execSQL(createQuery);
     }
