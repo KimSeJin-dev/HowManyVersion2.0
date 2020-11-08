@@ -67,23 +67,7 @@ public class MainActivity extends AppCompatActivity {
         //initGraph();
 
         prefs = getSharedPreferences("Pref", MODE_PRIVATE);
-  //      boolean isFirstRun = prefs.getBoolean("isFirstRun", true);
         checkFirstRun();
-
-//        Log.d("TAG","telepha2");
-//
-//        if (isFirstRun) {
-//
-//            Log.d("TAG","telepha3");
-//            Intent intent = new Intent(this, PopupActivity.class);
-//            startActivity(intent);
-//
-//            Log.d("TAG","telepha4");
-//            prefs.edit().putBoolean("isFirstRun", false).apply();
-//
-//            Log.d("TAG","telepha5");
-//        }
-
 
         mCircleView = (CircleProgressView) findViewById(R.id.circleView);
         mCircleView.setOnProgressChangedListener(new CircleProgressView.OnProgressChangedListener() {
@@ -95,6 +79,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         mCircleView.setMaxValue(100);
+        mCircleView.setOnTouchListener((v, event) -> true);
+
         mWebView = findViewById(R.id.webView);
 
         final BarView barView = (BarView) findViewById(R.id.line_view_float);
@@ -287,6 +273,8 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+
+
     private void initLineView(BarView barView) {
         ArrayList<String> test = new ArrayList<String>();
 
@@ -434,7 +422,7 @@ public class MainActivity extends AppCompatActivity {
 
         switch(final_date){
             case 1:
-                day_x = "";
+                day_x = "일";
                 break ;
             case 2:
                 day_x = "월";
@@ -461,6 +449,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
     private void initMyAPI(String baseUrl){
 
         Log.d(TAG,"initMyAPI : " + baseUrl);
@@ -479,11 +469,7 @@ public class MainActivity extends AppCompatActivity {
         if (result != null) {
 
             if (result.getContents() == null) {
-                String address_1 = "http://emoclew.pythonanywhere.com";// 주소 받아오기
-                Intent intent = new Intent(MainActivity.this, pWebView.class);
-                intent.putExtra("webview_addr",address_1);
-                startActivity(intent);
-               // Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
+               Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
 
             } else {
                 //qrcode 결과가 있으면

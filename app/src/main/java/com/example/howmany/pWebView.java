@@ -17,13 +17,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class pWebView extends AppCompatActivity {
     private static final String TAG = "MyTAG";
     private WebView mWebView;
     SQLiteDatabase db;
     String tableName = "Information";
-    MyAPI mMyAPI;
+    private final String BASE_URL = "http://emoclew.pythonanywhere.com";
+    private MyAPI mMyAPI;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +38,7 @@ public class pWebView extends AppCompatActivity {
         Log.d(myUrl,"테스트1");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.hotcheck_view);
-
+        initMyAPI(BASE_URL);
 
         // 웹뷰 셋팅
         mWebView = (WebView) findViewById(webView);//xml 자바코드 연결
@@ -49,6 +53,17 @@ public class pWebView extends AppCompatActivity {
 
     }
 
+    private void initMyAPI(String baseUrl){
+
+        Log.d(TAG,"initMyAPI : " + baseUrl);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        mMyAPI = retrofit.create(MyAPI.class);
+    }
+
 
 
 
@@ -57,7 +72,6 @@ public class pWebView extends AppCompatActivity {
 
         if(mWebView.getUrl().equalsIgnoreCase("http://emoclew.pythonanywhere.com/new/")){
             putInformation();
-            Log.d("TAG", "namemajor3" );
             super.onBackPressed();
         }
 
@@ -71,16 +85,6 @@ public class pWebView extends AppCompatActivity {
             super.onBackPressed();
         }
     }
-
-    private class WebViewClientClass extends WebViewClient {//페이지 이동
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            Log.d("check URL",url);
-            view.loadUrl(url);
-            return true;
-        }
-    }
-
 
     private void putInformation(){
         Log.d("TAG", "namemajor4");
@@ -99,30 +103,43 @@ public class pWebView extends AppCompatActivity {
                     String name = cursor.getString(cursor.getColumnIndex("NAME"));
                     String major = cursor.getString(cursor.getColumnIndex("MAJOR"));
                     String phone = cursor.getString(cursor.getColumnIndex("PHONE"));
-//
-//                    Log.d("TAG", "namemajor0" + name + major + phone);
-//                    PutInformation putInformation = new PutInformation(name,major,phone,"se");
-//
-//                    Log.d("TAG", "putIn " + putInformation);
-//                    Call<PutInformation> putCall = mMyAPI.putPost(phone, putInformation);
-//
-//                    Log.d("TAG", "namemajor1" + putCall);
-//                    putCall.enqueue(new Callback<PutInformation>() {
-//                        @Override
-//                        public void onResponse(Call<PutInformation> call, Response<PutInformation> response) {
-//                            if (!response.isSuccessful()) {
-//
-//                                Log.d("TAG", "namemajor2");
-//                                return;
-//                            }
-//                            String content = "";
-//                            content += "code: " + response.code() + "\n";
-//                            content += "정상적으로 삽입되었습니다..";
-//                        }
-//                        @Override
-//                        public void onFailure(Call<PutInformation> call, Throwable t) {
-//                        }
-//                    });
+
+                    Log.d( "TAG", "NAME= " + name + " "+ "MAJOR= " + major + " " + "PHONE= "  + phone);
+                    Post post = new Post();
+                    post.setName(name);
+                    post.setMajor(major);
+                    post.setPhone_num(phone);
+
+                    Call<Post> call = mMyAPI.putData(phone, post);
+
+                    Log.d("TAG", "namemajor10: ");
+                    call.enqueue(new Callback<Post>() {
+                        @Override
+                        public void onResponse(Call<Post> call, Response<Post> response) {
+                            if (!response.isSuccessful()){
+                                Log.d("TAG", "namemajor7: " + response.message());
+                                return;
+                            }
+
+                            Log.d("TAG", "namemajor9: ");
+                            Post postResponse = response.body();
+
+                            String content = "";
+                            content += "Code : " + response.code() + "\n";
+                            content += "Id : " + postResponse.getName() + "\n";
+                            content += "User Id : " + postResponse.getMajor() + "\n";
+                            content += "Title : " + postResponse.getPhone_num() + "\n";
+
+                            Log.d("TAG", "content : " + content );
+
+                        }
+
+                        @Override
+                        public void onFailure(Call<Post> call, Throwable t) {
+                            Log.d("TAG", "namemajor8: ");
+                        }
+                    });
+
 
 
                     Log.d("TAG", "phone: " + phone);
@@ -133,5 +150,22 @@ public class pWebView extends AppCompatActivity {
         db.close();
         databaseHelper.close();
     }
+
+
+    private class WebViewClientClass extends WebViewClient {//페이지 이동
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if(url.equals("http://emoclew.pythonanywhere.com/new2/"))
+            {
+                Toast.makeText(pWebView.this, "일일 그래프는 어플 재실행시 최신화됩니다." , Toast.LENGTH_SHORT).show();
+
+            }
+            Log.d("check URL",url);
+            view.loadUrl(url);
+            return true;
+        }
+    }
+
+
 
 }

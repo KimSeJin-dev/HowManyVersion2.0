@@ -2,6 +2,7 @@ package com.example.howmany
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.util.TypedValue
 import android.widget.Button
 import android.widget.TextView
@@ -46,8 +47,8 @@ class StopWatch : AppCompatActivity() {
         val textView = TextView(this)
         textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP,30F)
         textView.setTextColor(Color.parseColor("#FFFFFF"))
-        textView.text = "$Lap 세트 : ${lapTime / 100}" + "분 " + "${lapTime % 100}" + "초"
-         //맨 위에 랩타임 추가가
+        textView.text = "$Lap 세트 : ${lapTime / 6000}" + "분 " + "${(lapTime/100) % 60}" + "초"
+        //맨 위에 랩타임 추가가
         lapLayout.addView(textView, 0)
         Lap++
     }
@@ -63,11 +64,14 @@ class StopWatch : AppCompatActivity() {
 
         timerTask = timer(period = 10){
             time++
-            val sec = time / 100
-            val milli = time % 100
+            var min = time / 6000 //분
+            val sec = (time / 100)%60    //초
+
+            Log.d("TAG","time : " + time + " " + "min :  " + min + " " + "sec :  " + sec)
+
             runOnUiThread {
-                secTextView.text = "$sec"
-                milliTextView.text = "$milli"
+                secTextView.text = "$min" //분
+                milliTextView.text = "$sec" //초
             }
 
         }
@@ -81,8 +85,8 @@ class StopWatch : AppCompatActivity() {
         time = 0
         isRunning = false
         fab.setImageResource(R.drawable.ic_baseline_play_arrow_24)
-        secTextView.text = "0"
-        milliTextView.text = "00"
+        secTextView.text = "0" // 분
+        milliTextView.text = "0" //초
 
         lapLayout.removeAllViews()
         Lap = 1

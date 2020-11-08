@@ -23,7 +23,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "( ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "NAME TEXT , " +
                 "MAJOR TEXT, " +
-                "PHONE INTEGER );";
+                "PHONE TEXT );";
 
         sqLiteDatabase.execSQL(createQuery);
     }
