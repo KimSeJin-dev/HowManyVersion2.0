@@ -1,6 +1,5 @@
 package com.example.howmany;
 
-import com.google.gson.annotations.SerializedName;
 
 public class Post {
     private String name; // 분반

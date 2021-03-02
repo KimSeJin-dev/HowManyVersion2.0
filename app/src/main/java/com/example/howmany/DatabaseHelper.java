@@ -7,6 +7,8 @@ import android.util.Log;
 
 import static android.content.ContentValues.TAG;
 
+
+//데이터베이스 저장할 수 있는 DatabaseHelper
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     static final String TABLE_NAME = "Information";
@@ -23,7 +25,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "( ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 "NAME TEXT , " +
                 "MAJOR TEXT, " +
-                "PHONE TEXT );";
+                "PHONENUM TEXT, " +
+                "STUDENTNUM TEXT, " +
+                "EMAIL TEXT );";
+        Log.d(TAG,"Table Create :" + createQuery);
 
         sqLiteDatabase.execSQL(createQuery);
     }

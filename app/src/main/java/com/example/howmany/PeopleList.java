@@ -1,7 +1,5 @@
 package com.example.howmany;
 
-import android.graphics.drawable.Drawable;
-
 public class PeopleList {
     private Integer id;
     private String name; // 분반

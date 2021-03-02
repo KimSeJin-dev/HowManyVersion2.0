@@ -14,6 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".OutCreateQR"></activity>
+        <activity android:name=".InCreateQR" />
+        <activity android:name=".GoogleLogin" />
         <activity
             android:name=".splash"
             android:noHistory="true"
@@ -28,10 +31,8 @@
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="fullSensor"
             tools:replace="screenOrientation" />
-        <activity android:name=".FirstInput" />
         <activity android:name=".StopWatch" />
-        <activity android:name=".MainActivity"></activity>
-        <activity android:name=".pWebView" />
+        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

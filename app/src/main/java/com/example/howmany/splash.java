@@ -30,7 +30,7 @@ public class splash extends AppCompatActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                Intent intent = new Intent(splash.this, MainActivity.class);
+                Intent intent = new Intent(splash.this, GoogleLogin.class);
                 startActivity(intent);
             }
 

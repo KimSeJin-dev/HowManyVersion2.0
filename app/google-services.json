@@ -1,34 +1,41 @@
 {
   "project_info": {
-    "project_number": "445576766411",
-    "firebase_url": "https://howmany-4b838.firebaseio.com",
-    "project_id": "howmany-4b838",
-    "storage_bucket": "howmany-4b838.appspot.com"
+    "project_number": "948413181622",
+    "project_id": "howmany-5756e",
+    "storage_bucket": "howmany-5756e.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:445576766411:android:273001e2bb1e31c133cc4e",
+        "mobilesdk_app_id": "1:948413181622:android:e3e5d19ae65b4eadf28017",
         "android_client_info": {
           "package_name": "com.example.howmany"
         }
       },
       "oauth_client": [
         {
-          "client_id": "445576766411-8sd85cfhnrqreecc36dlrm9l5dg737t2.apps.googleusercontent.com",
+          "client_id": "948413181622-v6g7ck4k9gkgg1bb3552hjb3j9nogc4p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.howmany",
+            "certificate_hash": "e0baabfa87c7be11007bea8745466c5ef138901e"
+          }
+        },
+        {
+          "client_id": "948413181622-md1rtcisch7fbo7423gveaa5rrr6dag8.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyC7X6pQeNbpv4z9LeyzZrrIm2EZU0CZVDQ"
+          "current_key": "AIzaSyDUkhdbKY-dFwm2f0LmM1amfBTLkofGw7Q"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "445576766411-8sd85cfhnrqreecc36dlrm9l5dg737t2.apps.googleusercontent.com",
+              "client_id": "948413181622-md1rtcisch7fbo7423gveaa5rrr6dag8.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

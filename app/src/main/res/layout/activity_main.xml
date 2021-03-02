@@ -10,17 +10,36 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-        <Button
-            android:id="@+id/stopwatch"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_background"
-            android:text="세트 StopWatch"
-            android:textColor="#FFFFFF"
-            android:textSize="20dp"
-            android:textStyle="bold" />
+            android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/stopwatch"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:text="StopWatch"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+
+                <Button
+                    android:id="@+id/logOut"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_background"
+                    android:text="로그아웃"
+                    android:textColor="#FFFFFF"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+        </LinearLayout>
 
         <RelativeLayout
+            android:id="@+id/relativeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -54,11 +73,11 @@
                     CircleProgressView:cpv_showUnit="true"
                     CircleProgressView:cpv_spinColor="@color/primary"
                     CircleProgressView:cpv_textColor="@color/primary_dark"
-                    CircleProgressView:cpv_textScale="1"
-                    CircleProgressView:cpv_unit="%"
-                    CircleProgressView:cpv_unitColor="@color/primary_light"
+                    CircleProgressView:cpv_textScale="0.5"
+                    CircleProgressView:cpv_unit="명/50명"
+                    CircleProgressView:cpv_unitColor="@color/primary_dark"
                     CircleProgressView:cpv_unitPosition="right_top"
-                    CircleProgressView:cpv_unitScale="1"
+                    CircleProgressView:cpv_unitScale="2"
                     CircleProgressView:cpv_value="10" />
 
                 <Button
@@ -69,7 +88,7 @@
                     android:layout_marginTop="20dp"
                     android:layout_toEndOf="@+id/circleView"
                     android:background="@drawable/button_background"
-                    android:text="입장 QR코드"
+                    android:text="입장 QR체크인"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -83,7 +102,7 @@
                     android:layout_marginTop="10dp"
                     android:layout_toRightOf="@+id/circleView"
                     android:background="@drawable/button_background"
-                    android:text="퇴장 QR코드"
+                    android:text="퇴장 QR체크아웃"
                     android:textColor="#FFFFFF"
                     android:textSize="20sp"
                     android:textStyle="bold" />
@@ -91,28 +110,47 @@
 
         </RelativeLayout>
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="240sp"
+            android:layout_height="260sp"
             android:layout_marginTop="0dp"
-            >
-
-                <view
-                    android:id="@+id/line_view_float"
-                    class="im.dacer.androidcharts.BarView"
-                    android:layout_width="320dp"
-                    android:layout_height="210sp"
-                    tools:ignore="MissingConstraints"
-                    android:layout_margin="0dp"
-                    tools:layout_editor_absoluteX="45dp"
-                    tools:layout_editor_absoluteY="0dp" />
-
+            android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/textname"
+                    android:id="@+id/textname2"
                     android:layout_width="match_parent"
                     android:layout_height="20sp"
-                    android:layout_below="@+id/line_view_float"
+                    android:layout_above="@+id/imageView2"
+                    android:layout_marginRight="1dp"
+                    android:text="시간대별 입장인원(일주일)"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:textColor="#000000"
+                    android:textSize="15sp" />
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="5sp"
+                    android:id="@+id/imageView2"
+                    android:layout_above="@+id/barchart"
+                    android:src="@drawable/name"
+                    />
+
+                <org.eazegraph.lib.charts.BarChart
+                    android:id="@+id/barchart"
+                    android:layout_width="match_parent"
+                    android:layout_height="210sp"
+                    android:padding="10dp"
+                    android:foregroundGravity="center"
+                    CircleProgressView:egBarWidth="20dp"
+                    CircleProgressView:egFixedBarWidth="true"
+                    CircleProgressView:egLegendHeight="40dp" />
+
+                <TextView
+                    android:id="@+id/textname1"
+                    android:layout_width="match_parent"
+                    android:layout_height="20sp"
+                    android:layout_below="@+id/barchart"
                     android:layout_marginRight="1dp"
                     android:text="실시간 헬창들"
                     android:textStyle="bold"
@@ -121,116 +159,16 @@
                     android:textSize="15sp" />
 
                 <ImageView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
                     android:id="@+id/imageView1"
-                    android:layout_below="@+id/textname"
+                    android:layout_width="match_parent"
+                    android:layout_height="5sp"
+                    android:layout_below="@+id/textname1"
                     android:src="@drawable/name"
                     />
 
-                <TextView
-                    android:id="@+id/live_mon"
-                    android:layout_width="match_parent"
-                    android:layout_height="30sp"
-                    android:layout_toRightOf="@+id/line_view_float"
-                    android:background="@drawable/button_background"
-                    android:layout_marginRight="1dp"
-                    android:text="월 : 00명"
-                    android:textStyle="bold"
-                    android:gravity="center"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp" />
-
-                <TextView
-                    android:id="@+id/live_tue"
-                    android:layout_width="match_parent"
-                    android:layout_height="30sp"
-                    android:layout_below="@+id/live_mon"
-                    android:layout_toRightOf="@+id/line_view_float"
-                    android:background="@drawable/button_background"
-                    android:layout_marginRight="1dp"
-                    android:gravity="center"
-                    android:textStyle="bold"
-                    android:text="화 : 00명"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp" />
 
 
-                <TextView
-                    android:id="@+id/live_wen"
-                    android:layout_width="match_parent"
-                    android:layout_height="30sp"
-                    android:layout_below="@+id/live_tue"
-                    android:layout_marginRight="1dp"
-                    android:layout_toRightOf="@+id/line_view_float"
-                    android:background="@drawable/button_background"
-                    android:gravity="center"
-                    android:text="수 : 00명"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp" />
-
-
-                <TextView
-                    android:id="@+id/live_thur"
-                    android:layout_width="match_parent"
-                    android:layout_height="30sp"
-                    android:layout_below="@+id/live_wen"
-                    android:layout_toRightOf="@+id/line_view_float"
-                    android:background="@drawable/button_background"
-                    android:layout_marginRight="1dp"
-                    android:gravity="center"
-                    android:text="목 : 00명"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp" />
-
-
-                <TextView
-                    android:id="@+id/live_fri"
-                    android:layout_width="match_parent"
-                    android:layout_height="30sp"
-                    android:layout_below="@+id/live_thur"
-                    android:layout_toRightOf="@+id/line_view_float"
-                    android:background="@drawable/button_background"
-                    android:gravity="center"
-                    android:text="금 : 00명"
-                    android:layout_marginRight="1dp"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp" />
-
-
-                <TextView
-                    android:id="@+id/live_sat"
-                    android:layout_width="match_parent"
-                    android:layout_height="30sp"
-                    android:layout_below="@+id/live_fri"
-                    android:layout_toRightOf="@+id/line_view_float"
-                    android:background="@drawable/button_background"
-                    android:layout_marginRight="1dp"
-                    android:gravity="center"
-                    android:text="토 : 00명"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp" />
-
-
-                <TextView
-                    android:id="@+id/live_sun"
-                    android:layout_width="match_parent"
-                    android:layout_height="30sp"
-                    android:layout_below="@+id/live_sat"
-                    android:layout_toRightOf="@+id/line_view_float"
-                    android:background="@drawable/button_background"
-                    android:layout_marginRight="1dp"
-                    android:gravity="center"
-                    android:text="일 : 00명"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp" />
-
-        </RelativeLayout>
+        </LinearLayout>
 
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout

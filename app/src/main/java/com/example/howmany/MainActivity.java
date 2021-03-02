@@ -1,9 +1,9 @@
 package com.example.howmany;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,14 +15,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.google.zxing.integration.android.IntentIntegrator;
-import com.google.zxing.integration.android.IntentResult;
+import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
+import com.google.firebase.auth.FirebaseAuth;
+
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,21 +47,33 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import android.widget.ImageView;
 
+import org.eazegraph.lib.charts.BarChart;
+import org.eazegraph.lib.charts.PieChart;
+import org.eazegraph.lib.models.BarModel;
+
 
 public class MainActivity extends AppCompatActivity {
 
+    Button btnLogout;
+    private GoogleApiClient mGoogleApiClient;
+    private FirebaseAuth mAuth;
     public SharedPreferences prefs;
-    SQLiteDatabase db;
-    String tableName = "Information";
+
+    BarChart chart2;
 
     int Mon, Tue, Wed, Thu, Fri, Sat, Sun = 0;
+    private String Six = "0", Seven = "0", Eight = "0", THIRTeen = "0",
+    FourTeen = "0",FifTeen = "0",SixTeen = "0",SevenTeen = "0",EIGHTeen = "0",NineTeen = "0";
+    private String Twenty = "0",TwentyOne = "0";
+    private Float six = 0.0f,seven = 0.0f,eight = 0.0f,thirteen = 0.0f,fourteen = 0.0f,
+            fifteen = 0.0f,sixteen = 0.0f,seventeen = 0.0f,eighteen = 0.0f,
+            nineteen = 0.0f,twenty = 0.0f,twentyOne = 0.0f;
+    int count = 0;
     private final String TAG = getClass().getSimpleName();
     ArrayList<PeopleList> arrayList = new ArrayList<>();
-    private final String BASE_URL = "http://emoclew.pythonanywhere.com";
+    private final String BASE_URL = "http://163.152.223.34:8000";
     private MyAPI mMyAPI;
     public static WebView mWebView;
-
-    private IntentIntegrator qrScan;
 
     int[] images =  new int[] {R.drawable.health1, R.drawable.health2,
     R.drawable.health3, R.drawable.health4, R.drawable.health45,R.drawable.health6,
@@ -63,11 +85,70 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d("TAG","telepha0");
-        //initGraph();
+
+
+        initMyAPI(BASE_URL);
+        btnLogout = (Button) findViewById(R.id.logOut);
+
+        chart2 = (BarChart) findViewById(R.id.barchart);
+        chart2.clearChart();
+
+        randomSet();
+
+
+
+        // GoogleSignInOptions 개체 구성
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+
+        // Build a GoogleApiClient with access to the Google Sign-In API and the options specified by gso.
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .enableAutoManage(this, new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+                        Log.d(TAG, "Login fail");
+                    }
+                })
+                .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                .build();
+
+        mAuth = FirebaseAuth.getInstance();
+
+        btnLogout.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+                AlertDialog.Builder alt_bld = new AlertDialog.Builder(v.getContext());
+                alt_bld.setMessage("로그아웃 하시겠습니까?").setCancelable(false)
+                        .setPositiveButton("네",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        signOut();
+                                    }
+                                }).setNegativeButton("아니오",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.cancel();
+                            }
+                        });
+
+                AlertDialog alert = alt_bld.create();
+                alert.setTitle("로그아웃");                // 대화창 아이콘 설정
+
+                alert.setIcon(R.drawable.common_google_signin_btn_icon_dark);
+
+                // 대화창 배경 색 설정
+
+                alert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.argb(255,255,255,255)));
+                alert.show();
+                }
+        });
 
         prefs = getSharedPreferences("Pref", MODE_PRIVATE);
-        checkFirstRun();
 
         mCircleView = (CircleProgressView) findViewById(R.id.circleView);
         mCircleView.setOnProgressChangedListener(new CircleProgressView.OnProgressChangedListener() {
@@ -83,11 +164,6 @@ public class MainActivity extends AppCompatActivity {
 
         mWebView = findViewById(R.id.webView);
 
-        final BarView barView = (BarView) findViewById(R.id.line_view_float);
-
-        initMyAPI(BASE_URL);
-        initLineView(barView);
-        randomSet(barView);
         Button mStopWatch = findViewById(R.id.stopwatch);
         mStopWatch.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,17 +176,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-        qrScan = new IntentIntegrator(this);
         Button buttonScan_In = (Button) findViewById(R.id.buttonScan_In);
         buttonScan_In.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                qrScan.initiateScan();
-                qrScan.setOrientationLocked(false);
-                qrScan.setPrompt("스캐너에 QR코드를 위치시켜주세요");
 
-
+                Intent newIntent = new Intent(MainActivity.this, InCreateQR.class);
+                startActivity(newIntent);
             }
         });
 
@@ -118,13 +190,11 @@ public class MainActivity extends AppCompatActivity {
         buttonScan_Out.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                qrScan.initiateScan();
-                qrScan.setOrientationLocked(false);
-                qrScan.setPrompt("스캐너에 QR코드를 위치시켜주세요");
-                deleteInformation();
-
+                Intent newIntent = new Intent(MainActivity.this, OutCreateQR.class);
+                startActivity(newIntent);
             }
         });
+
 
         initMyAPI(BASE_URL);
 
@@ -149,12 +219,15 @@ public class MainActivity extends AppCompatActivity {
                             PeopleList peopleList = new PeopleList();
 
                             peopleList.setId(images[imageId]);
-                            peopleList.setName(item.getName());
+                            String realName = item.getName();
+                            String realRealName = realName.substring(0,1) + "**";//이름 변경 ex)강민규 >> 강**
+                            peopleList.setName(realRealName);
                             peopleList.setMajor(item.getMajor());
                             Log.d(TAG, "Test_ex" + item.getEnter_time());
+
                             peopleList.setEnter_time(
                                     item.getEnter_time().substring(11,13) + "시 " +
-                                    item.getEnter_time().substring(14,16) + "분 " ); //2020-09-29T13:18:33
+                                    item.getEnter_time().substring(14,16) + "분 " ); //2020-09-29T13:18:33 2021/02/15 21:28:28
                             arrayList.add(peopleList);
 
 
@@ -171,10 +244,12 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
+
             final SwipeRefreshLayout swipeRefreshLayout = findViewById(R.id.refresh_layout);
             swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
                 @Override
                 public void onRefresh() {
+
 
                     Call<List<PostItem>> getCall = mMyAPI.get_posts();
                     getCall.enqueue(new Callback<List<PostItem>>() {
@@ -190,9 +265,13 @@ public class MainActivity extends AppCompatActivity {
                                     PeopleList peopleList = new PeopleList();
 
                                     peopleList.setId(images[imageId]);
-                                    peopleList.setName(item.getName());
+                                    String realName = item.getName();
+                                    String realRealName = realName.substring(0,1) + "**";//이름 변
+                                    peopleList.setName(realRealName);
                                     peopleList.setMajor(item.getMajor());
 
+
+                                    Log.d("TAG","item.getEnter_time" + item.getEnter_time());
                                     peopleList.setEnter_time(
                                             item.getEnter_time().substring(11,13) + "시 " +
                                             item.getEnter_time().substring(14,16) + "분 "); //2020-09-29T13:18:33
@@ -226,85 +305,53 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //로그아웃
+    private void signOut(){
 
-    private void deleteInformation(){
-
-        DatabaseHelper databaseHelper = new DatabaseHelper(MainActivity.this, "DB", null, 1);
-        // 쓰기 가능한 SQLiteDatabase 인스턴스 구함
-        db = databaseHelper.getWritableDatabase();
-
-        try (Cursor cursor = db.query(tableName, null, null, null, null, null, null)) {
-            if (cursor != null) {
-                while (cursor.moveToNext()) {
-                    String phone = cursor.getString(cursor.getColumnIndex("PHONE"));
-
-                    Call<PostItem> deleteCall = mMyAPI.delete_posts(phone);
-
-                    deleteCall.enqueue(new Callback<PostItem>() {
+        mGoogleApiClient.connect();
+        mGoogleApiClient.registerConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+            @Override
+            public void onConnected(@Nullable Bundle bundle) {
+                mAuth.signOut();
+                if(mGoogleApiClient.isConnected()){
+                    Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>() {
                         @Override
-                        public void onResponse(Call<PostItem> call, Response<PostItem> response) {
-                            if (!response.isSuccessful()) {
-                                Toast.makeText(MainActivity.this, "실패했습니다. 에러메시지 : " + response.message(), Toast.LENGTH_SHORT).show();
-                                return;
+                        public void onResult(@NonNull Status status) {
+                            if(status.isSuccess()){
+                                Log.d("TAG","User Logged Out");
+                                setResult(1);
                             }
-                            String content = "";
-                            content += "code: " + response.code() + "\n";
-                            content += "정상적으로 삭제되었습니다.";
-                        }
+                            else {
+                                setResult(0);
+                            }
 
-                        @Override
-                        public void onFailure(Call<PostItem> call, Throwable t) {
-
-                            Toast.makeText(MainActivity.this, "Cancelled :" + t.getMessage(), Toast.LENGTH_SHORT).show();
-
+                            finish();
                         }
                     });
-
-
-                    Log.d("TAG", "phone: " + phone);
                 }
             }
-        }
 
-        db.close();
-        databaseHelper.close();
-
+            @Override
+            public void onConnectionSuspended(int i) {
+                Log.d("TAG","Google API Client Connection Suspended");
+                setResult(-1);
+                finish();
+            }
+        });
     }
 
+    private void initMyAPI(String baseUrl){
 
+        Log.d(TAG,"initMyAPI : " + baseUrl);
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
 
-
-
-    private void initLineView(BarView barView) {
-        ArrayList<String> test = new ArrayList<String>();
-
-        test.add("월");
-        test.add("화");
-        test.add("수");
-        test.add("목");
-        test.add("금");
-        test.add("토");
-        test.add("일");
-
-        barView.setBottomTextList(test);
-
-
+        mMyAPI = retrofit.create(MyAPI.class);
     }
 
-
-    public void checkFirstRun() {
-        boolean isFirstRun = prefs.getBoolean("isFirstRun", true);
-        if (isFirstRun) {
-            Intent newIntent = new Intent(MainActivity.this, FirstInput.class);
-            startActivity(newIntent);
-            Log.d("TAG","telepha");
-            prefs.edit().putBoolean("isFirstRun", false).apply();
-        }
-
-    }
-
-
-    private void randomSet(final BarView barViewFloat) {
+    private void randomSet() {
 
         Call<List<PostItem>> getCall = mMyAPI.get_graph_posts();
         getCall.enqueue(new Callback<List<PostItem>>() {
@@ -314,55 +361,98 @@ public class MainActivity extends AppCompatActivity {
                     List<PostItem> mList = response.body();
 
                     for (PostItem item : mList) {
-                        String day = item.getExit_time().substring(0,10);
-                        String Date  = getDateDay(day);
-                        if(Date == "월"){ Mon++; }
-                        else if(Date == "화"){ Tue++; }
-                        else if(Date == "수"){ Wed++; }
-                        else if(Date == "목"){ Thu++; }
-                        else if(Date == "금"){ Fri++; }
-                        else if(Date == "토"){ Sat++; }
-                        else if(Date == "일"){ Sun++; }
-                        Log.d(TAG, "example2 : " + Fri);
+                        count += 1;
+                        Log.d("TAG","count : " + count);
+                        Log.d("TAG","EnterTime : " + item.getEnter_time());
+                        String day = item.getEnter_time().substring(11,13);
+                        int dayToInt = Integer.parseInt(day);
+                        Log.d("TAG","dayToInt : " + dayToInt);
+                        switch(dayToInt){
+                            case 6:
+                                Six += 1;
+                                break;
+                            case 7:
+                                Seven += 1;
+                                break;
+                            case 8:
+                                Eight += 1;
+                                break;
+                            case 13:
+                                THIRTeen += 1;
+                                Log.d("TAG","thirteen " + THIRTeen);
+
+                                break;
+                            case 14:
+                                FourTeen += 1;
+                                break;
+                            case 15:
+                                FifTeen += 1;
+                                break;
+                            case 16:
+                                SixTeen += 1;
+                                break;
+                            case 17:
+                                SevenTeen += 1;
+                                break;
+                            case 18:
+                                EIGHTeen += 1;
+                                break;
+                            case 19:
+                                NineTeen += 1;
+                                break;
+                            case 20:
+                                Twenty += 1;
+                                break;
+                            case 21:
+                                TwentyOne += 1;
+                                break;
+                        }
+
                     }
 
-                    TextView textView_mon = (TextView) findViewById(R.id.live_mon);
-                    TextView textView_tue = (TextView) findViewById(R.id.live_tue);
-                    TextView textView_wed = (TextView) findViewById(R.id.live_wen);
-                    TextView textView_thur = (TextView) findViewById(R.id.live_thur);
-                    TextView textView_fri = (TextView) findViewById(R.id.live_fri);
-                    TextView textView_sat = (TextView) findViewById(R.id.live_sat);
-                    TextView textView_sun = (TextView) findViewById(R.id.live_sun);
 
-                    textView_mon.setText("월 : "+Mon + "명");
-                    textView_tue.setText("화 : " + Tue + "명");
-                    textView_wed.setText("수 : " + Wed +"명");
-                    textView_thur.setText("목 : " + Thu + "명");
-                    textView_fri.setText("금 : " + Fri + "명");
-                    textView_sat.setText("토 : " + Sat +"명");
-                    textView_sun.setText("일 : " + Sun + "명");
+                    six = Float.parseFloat(Six);
+                    seven = Float.parseFloat(Seven);
+                    eight = Float.parseFloat(Eight);
+                    thirteen = Float.parseFloat(THIRTeen);
+                    fourteen = Float.parseFloat(FourTeen);
+                    fifteen = Float.parseFloat(FifTeen);
+                    sixteen = Float.parseFloat(SixTeen);
+                    seventeen = Float.parseFloat(SevenTeen);
+                    eighteen = Float.parseFloat(EIGHTeen);
+                    nineteen = Float.parseFloat(NineTeen);
+                    twenty = Float.parseFloat(Twenty);
+                    twentyOne = Float.parseFloat(TwentyOne);
 
-                    ArrayList<Integer> dataListF = new ArrayList<>();
-                    dataListF.add(Mon);
-                    dataListF.add(Tue);
-                    dataListF.add(Wed);
-                    dataListF.add(Thu);
-                    dataListF.add(Fri);
-                    dataListF.add(Sat);
-                    dataListF.add(Sun);
+                    chart2.addBar(new BarModel("6시", six, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("7시", seven, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("8시", eight, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("13시", thirteen, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("14시", fourteen, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("15시", fifteen, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("16시", sixteen, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("17시", seventeen, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("18시", eighteen, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("19시", nineteen, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("20시", twenty, 0xFFFFB6C1));
+                    chart2.addBar(new BarModel("21시", twentyOne, 0xFFFFB6C1));
 
-                    barViewFloat.setDataList(dataListF,150);
-                    Mon = 0;
-                    Tue = 0;
-                    Wed = 0;
-                    Thu = 0;
-                    Fri = 0;
-                    Sat = 0;
-                    Sun = 0;
+                    chart2.startAnimation();
 
                 } else {
                     Log.d(TAG, "Status Code : " + response.code());
                 }
+            }
+
+            private String toString(Calendar cal) {
+                final String[] arrWeek = {"", "일", "월", "화", "수", "목", "금", "토"};
+                int year = cal.get(Calendar.YEAR);
+                int mon = cal.get(Calendar.MONTH)+1;
+                int date = cal.get(Calendar.DATE);
+                String weekDay = arrWeek[cal.get(Calendar.DAY_OF_WEEK)];
+
+                return ( year + " 년 " + mon + "월" + date + "일 (" + weekDay + "요일)");
+
             }
 
             @Override
@@ -371,33 +461,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
-//    private void initGraph(){
-//
-//        //오늘
-//        Date today = new Date();
-//        SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
-//        String toDay = date.format(today);
-//
-//        Log.d("TAG", "toDay : " + toDay);
-//
-//        //한주 전
-//        Calendar week = Calendar.getInstance();
-//        week.add(Calendar.DATE , -7);
-//        String beforeWeek = new java.text.SimpleDateFormat("yyyy-MM-dd").format(week.getTime());
-//
-//
-//
-//
-//
-//
-//    }
-
-
-
-
-
-
 
     private String getDateDay(String day){
         String day_x ="";
@@ -450,42 +513,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-    private void initMyAPI(String baseUrl){
-
-        Log.d(TAG,"initMyAPI : " + baseUrl);
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(baseUrl)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        mMyAPI = retrofit.create(MyAPI.class);
-    }
-    //Getting the scan results
-    //qr코드 승인 , qr코드 없을시
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-
-            if (result.getContents() == null) {
-               Toast.makeText(MainActivity.this, "Cancelled", Toast.LENGTH_SHORT).show();
-
-            } else {
-                //qrcode 결과가 있으면
-                Toast.makeText(MainActivity.this, "Scan Perfect", Toast.LENGTH_SHORT).show();
-                //data를 json으로 변환
-                String address_1 = result.getContents();// 주소 받아오기
-                Intent intent = new Intent(MainActivity.this, pWebView.class);
-                intent.putExtra("webview_addr",address_1);
-                startActivity(intent);
-
-            }
-
-        } else {
-            super.onActivityResult(requestCode, resultCode, data);
-        }
-    }
 
     public class CustomAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

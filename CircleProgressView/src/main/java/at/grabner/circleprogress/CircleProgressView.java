@@ -1003,6 +1003,7 @@ public class CircleProgressView extends View {
         setDirection(Direction.values()[a.getInt(R.styleable.CircleProgressView_cpv_direction, 0)]);
 
         float value = a.getFloat(R.styleable.CircleProgressView_cpv_value, mCurrentValue);
+        Log.d("TAG","value : "+ value);
         setValue(value);
         mCurrentValue = value;
 

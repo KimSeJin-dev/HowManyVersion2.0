@@ -1,9 +1,5 @@
 package com.example.howmany;
 
-import android.graphics.drawable.Drawable;
-import android.media.Image;
-import android.widget.ImageView;
-
 public class PostItem {
     private String name; // 분반
     private String major; // 학수번호
